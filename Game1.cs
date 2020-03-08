@@ -20,6 +20,7 @@ namespace TDGame {
         private Player _player;
         private EnemyManager _enemy_manager;
         private BulletHitsEnemy _bullet_hits_enemy;
+        private EnergyStorageManager _energy_storage_manager;
 
         private double _el_time = 0;
 
@@ -38,9 +39,9 @@ namespace TDGame {
             new Vector2(1000, 300)
         };
 
-        private List<Rectangle> vec2 = new List<Rectangle>() {
-            new Rectangle(350, 300, 80, 80),
-            new Rectangle(750, 300, 80, 80)
+        private List<Vector2> energy_portal_locations= new List<Vector2>() {
+            new Vector2(350, 300),
+            new Vector2(750, 300)
         };
 
         public Game1() {
@@ -78,9 +79,17 @@ namespace TDGame {
 
             Rectangle win_size = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
 
+            _energy_storage_manager = new EnergyStorageManager(
+                Content.Load<Texture2D>("portal"),
+                256,
+                144
+            );
+            foreach(var a in energy_portal_locations)
+                _energy_storage_manager.Add(a, 1000);
+
             _enemy_manager = new EnemyManager(
                 vec1,
-                vec2, 
+                ref _energy_storage_manager, 
                 Content.Load<Texture2D>("Enemy")
             );
 
@@ -103,6 +112,8 @@ namespace TDGame {
                 ref _bullet_manager,
                 ref _player
             );
+
+            
 
             //bhe = new BulletHitsEnemy(ref Enemy._enemies, ref Bullet._bullets);
         }
@@ -158,6 +169,7 @@ namespace TDGame {
             _bullet_manager.Draw(spriteBatch);
             _enemy_manager.Draw(spriteBatch);
             _player.Draw(spriteBatch);
+            _energy_storage_manager.Draw(spriteBatch);
             spriteBatch.End();
 
 

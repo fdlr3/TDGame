@@ -8,8 +8,8 @@ namespace TDGame.Managers {
     public class SpriteObject : ICloneable {
         protected Texture2D _texture;
         public Vector2 _position;
-        protected int _width;
-        protected int _heigth;
+        public int _width;
+        public int _heigth;
         public bool _isvalid;
 
         public SpriteObject(Texture2D texture, int w, int h){

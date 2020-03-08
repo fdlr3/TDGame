@@ -15,12 +15,12 @@ namespace TDGame.Managers {
         private Enemy _rootEnemy;
         public List<Enemy> Enemies { get; set; }
         private List<Vector2> _spawn_locations;
-        private List<Rectangle> _target_location;
+        private EnergyStorageManager _energy_manager;
         private Random _rand;
 
-        public EnemyManager(List<Vector2> spawnLocations, List<Rectangle> target_locations, Texture2D texture) {
+        public EnemyManager(List<Vector2> spawnLocations, ref EnergyStorageManager energy_manager, Texture2D texture) {
             _spawn_locations = spawnLocations;
-            _target_location = target_locations;
+            _energy_manager = energy_manager;
             _rootEnemy = new Enemy(texture, 50, 50, 200, 10, -5);
             _rand = new Random();
             Enemies = new List<Enemy>();
@@ -33,16 +33,18 @@ namespace TDGame.Managers {
             int j = 0;
             float dist = float.MaxValue;
 
-            for(int i = 0; i < _target_location.Count; i++) {
-                Vector2 center = _target_location[i].Center.ToVector2();
-                float cur_dist = Vector2.Distance(_spawn_locations[sel_spawn], center);
+            for(int i = 0; i < _energy_manager._enemy_storages.Count; i++) {
+                var c = _energy_manager._enemy_storages[i];
+                Rectangle center = new Rectangle((int)c._position.X, (int)c._position.Y, c._width, c._heigth);
+                float cur_dist = Vector2.Distance(_spawn_locations[sel_spawn], center.Center.ToVector2());
 
                 if(cur_dist < dist) {
                     dist = cur_dist;
                     j = i;
                 }
             }
-            x.Init(_spawn_locations[sel_spawn], _target_location[j]);
+            var final_loc = _energy_manager._enemy_storages[j];
+            x.Init(_spawn_locations[sel_spawn], new Rectangle((int)final_loc._position.X, (int)final_loc._position.Y, final_loc._width, final_loc._heigth));
             Enemies.Add(x);
         }
 
