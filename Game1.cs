@@ -3,8 +3,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using System.Diagnostics;
-using TDGame.Sprites;
 using System.Linq;
+using TDGame.Managers;
 
 namespace TDGame {
     /// <summary>
@@ -78,11 +78,31 @@ namespace TDGame {
 
             Rectangle win_size = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
 
-            _enemy_manager = new EnemyManager(vec1, vec2, Content.Load<Texture2D>("Enemy"));
+            _enemy_manager = new EnemyManager(
+                vec1,
+                vec2, 
+                Content.Load<Texture2D>("Enemy")
+            );
 
-            _bullet_manager = new BulletManager(Content.Load<Texture2D>("CustomBullet"), win_size);
-            _player = new Player(Content.Load<Texture2D>("playa"), win_size, new Rectangle(0, 0, 72, 72));
-            _bullet_hits_enemy = new BulletHitsEnemy(ref _enemy_manager, ref _bullet_manager);
+            _bullet_manager = new BulletManager(
+                Content.Load<Texture2D>("CustomBullet"), 
+                win_size
+            );
+
+            _player = new Player(
+                Content.Load<Texture2D>("playa"), 
+                win_size, 
+                new Vector2(0, 0), 
+                70, 
+                70, 
+                40
+            );
+
+            _bullet_hits_enemy = new BulletHitsEnemy(
+                ref _enemy_manager, 
+                ref _bullet_manager,
+                ref _player
+            );
 
             //bhe = new BulletHitsEnemy(ref Enemy._enemies, ref Bullet._bullets);
         }

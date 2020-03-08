@@ -8,9 +8,10 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 
-namespace TDGame.Sprites {
+namespace TDGame.Managers {
 
     public class EnemyManager {
+
         private Enemy _rootEnemy;
         public List<Enemy> Enemies { get; set; }
         private List<Vector2> _spawn_locations;
@@ -20,7 +21,7 @@ namespace TDGame.Sprites {
         public EnemyManager(List<Vector2> spawnLocations, List<Rectangle> target_locations, Texture2D texture) {
             _spawn_locations = spawnLocations;
             _target_location = target_locations;
-            _rootEnemy = new Enemy(texture);
+            _rootEnemy = new Enemy(texture, 50, 50, 200, 10, -5);
             _rand = new Random();
             Enemies = new List<Enemy>();
         }
@@ -61,66 +62,5 @@ namespace TDGame.Sprites {
             }
         }
 
-
-
-    }
-
-    public class Enemy : ICloneable {
-        public Texture2D _texture;
-        public Vector2 _position;
-        private Rectangle _final_position;
-        private Vector2 _direction;
-        private bool _arrived;
-        public int _health = 100;
-        public bool _isvalid;
-
-
-        public Enemy(Texture2D texture2D) {
-            _texture = texture2D;
-            _isvalid = false;
-            _arrived = false;
-        }
-
-        public void Init(Vector2 position, Rectangle final_position) {
-            _position = position;
-            _isvalid = true;
-            _arrived = false;
-            Vector2 diff = Vector2.Subtract(position, final_position.Center.ToVector2());
-            _direction = Vector2.Normalize(diff);
-            _final_position = final_position;
-        }
-
-        public void Damage(int dmg) {
-            this._health -= dmg;
-            if (_health <= 0)
-                _isvalid = false;
-        }
-
-        public void Update() {
-            //todo go till _destination is achieved
-            if (_final_position.Contains(_position))
-                _arrived = true;
-            if (!_arrived)
-                _position += _direction * -2;
-                
-        }
-
-        public void Draw(SpriteBatch spriteBatch) {
-            spriteBatch.Draw(
-                _texture,
-                _position,
-                null,
-                Color.White,
-                0.0f,
-                default,
-                new Vector2(1, 1),
-                SpriteEffects.None,
-                0.25f
-            );
-        }
-
-        public object Clone() {
-            return this.MemberwiseClone();
-        }
-    }
+    }    
 }

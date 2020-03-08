@@ -6,30 +6,31 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
-namespace TDGame.Sprites {
-    public class Player {
-        private Texture2D _texture;
-        private Rectangle _position;
+namespace TDGame.Managers {
+    public class Player : SpriteObject {
         private Rectangle _window_size;
         private Vector2 _direction;
         private float _angle = 0f;
+        public int _strength;
 
 
-        public Player(Texture2D texture, Rectangle win_size, Rectangle position) {
+        public Player(Texture2D texture, Rectangle win_size, Vector2 position, int w, int h, int strength) 
+            : base(texture, w, h) {
             _position = position;
-            _texture = texture;
             _window_size = win_size;
             _direction = new Vector2(0, 0);
+            _strength = strength;
         }      
         public Vector2 GetPosition() {
-            return new Vector2(_position.X, _position.Y);
+            return _position;
         }
         public Vector2 GetDirection() {
             return _direction;
         }
         public void Update(KeyboardState ks, MouseState ms) {
             var n_v = _position;
-            var cam_v = new Vector2(ms.X, ms.Y) - _position.Center.ToVector2();
+            var _pos_center = new Rectangle((int)_position.X, (int)_position.Y, _width, _heigth);
+            var cam_v = new Vector2(ms.X, ms.Y) - _pos_center.Center.ToVector2();
             _angle = (float)Math.Atan2(cam_v.Y, cam_v.X);
 
             if (ks.IsKeyDown(Keys.W)) {
@@ -46,7 +47,7 @@ namespace TDGame.Sprites {
                 _position = n_v;
 
                 //set camera position
-                Vector2 diff = Vector2.Subtract(new Vector2(_position.X, _position.Y), new Vector2(ms.X, ms.Y));
+                Vector2 diff = Vector2.Subtract(_position, new Vector2(ms.X, ms.Y));
                 _direction = Vector2.Normalize(diff);
             }
             Debug.WriteLine($"C: ({_position.X}, {_position.Y}) M: ({ms.X}, {ms.Y}) Angle: {_angle}");
@@ -54,11 +55,11 @@ namespace TDGame.Sprites {
         public void Draw(SpriteBatch spriteBatch) {
             spriteBatch.Draw(
                 _texture,
-                _position,
+                new Rectangle((int)_position.X, (int)_position.Y, _width, _heigth),
                 null,
                 Color.White,
                 (float)(_angle + (Math.PI * 0.5f)),
-                new Vector2(_position.Width / 2, _position.Height / 2),
+                new Vector2(_width / 2, _heigth / 2),
                 SpriteEffects.FlipVertically,
                 .75f
             );
