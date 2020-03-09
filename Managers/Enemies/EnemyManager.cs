@@ -21,7 +21,7 @@ namespace TDGame.Managers {
         public EnemyManager(List<Vector2> spawnLocations, ref EnergyStorageManager energy_manager, Texture2D texture) {
             _spawn_locations = spawnLocations;
             _energy_manager = energy_manager;
-            _rootEnemy = new Enemy(texture, 50, 50, 200, 10, -5);
+            _rootEnemy = new Enemy(texture, 48, 50, 200, 10, -5);
             _rand = new Random();
             Enemies = new List<Enemy>();
         }
@@ -44,7 +44,21 @@ namespace TDGame.Managers {
                 }
             }
             var final_loc = _energy_manager._enemy_storages[j];
-            x.Init(_spawn_locations[sel_spawn], new Rectangle((int)final_loc._position.X, (int)final_loc._position.Y, final_loc._width, final_loc._heigth));
+            Vector2 start_position = _spawn_locations[sel_spawn];
+            Rectangle final_position = new Rectangle(
+                (int)final_loc._position.X,
+                (int)final_loc._position.Y,
+                final_loc._width,
+                final_loc._heigth
+            );
+
+            //calculate angle
+            float monster_angle = .0f;
+            var _pos_center = new Rectangle((int)start_position.X + 10, (int)start_position.Y + 10, _rootEnemy._width, _rootEnemy._heigth);
+            var cam_v = final_loc._position - _pos_center.Center.ToVector2();
+            monster_angle = (float)Math.Atan2(cam_v.Y, cam_v.X);
+
+            x.Init(start_position, final_position, monster_angle);
             Enemies.Add(x);
         }
 

@@ -14,7 +14,7 @@ namespace TDGame.Managers {
 		public List<Bullet> Bullets { get; set; }
 
 		public BulletManager(Texture2D texture, Rectangle window_size) {
-			_rootBullet = new Bullet(texture, -20, 10, 10);
+			_rootBullet = new Bullet(texture, -40, 10, 10);
 			_window_size = window_size;
 			Bullets = new List<Bullet>();
 		}

@@ -29,18 +29,18 @@ namespace TDGame.Managers {
         }
         public void Update(KeyboardState ks, MouseState ms) {
             var n_v = _position;
-            var _pos_center = new Rectangle((int)_position.X, (int)_position.Y, _width, _heigth);
+            var _pos_center = new Rectangle((int)_position.X + 10, (int)_position.Y + 10, _width, _heigth);
             var cam_v = new Vector2(ms.X, ms.Y) - _pos_center.Center.ToVector2();
             _angle = (float)Math.Atan2(cam_v.Y, cam_v.X);
 
             if (ks.IsKeyDown(Keys.W)) {
-                n_v.Y -= 3;
+                n_v.Y -= 8;
             } if (ks.IsKeyDown(Keys.S)) {
-                n_v.Y += 3;
+                n_v.Y += 8;
             } if (ks.IsKeyDown(Keys.A)) {
-                n_v.X -= 3;
+                n_v.X -= 8;
             } if (ks.IsKeyDown(Keys.D)) {
-                n_v.X += 3;
+                n_v.X += 8;
             }
 
             if (_window_size.Contains(n_v)) {
@@ -58,9 +58,9 @@ namespace TDGame.Managers {
                 new Rectangle((int)_position.X, (int)_position.Y, _width, _heigth),
                 null,
                 Color.White,
-                (float)(_angle + (Math.PI * 0.5f)),
+                (float)(_angle),
                 new Vector2(_width / 2, _heigth / 2),
-                SpriteEffects.FlipVertically,
+                SpriteEffects.None,
                 .75f
             );
         }

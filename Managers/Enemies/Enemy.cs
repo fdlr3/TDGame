@@ -13,6 +13,10 @@ namespace TDGame.Managers {
         public int _health;
         public int _strength;
         public int _velocity;
+        public int _counter;
+        public int _pause;
+        public float _angle = .0f;
+        
 
 
         public Enemy(Texture2D texture, int w, int h, int health, int strength, int velocity)
@@ -23,13 +27,16 @@ namespace TDGame.Managers {
             _velocity = velocity;
         }
 
-        public void Init(Vector2 position, Rectangle final_position) {
+        public void Init(Vector2 position, Rectangle final_position, float angle) {
             _position = position;
             _isvalid = true;
             _arrived = false;
             Vector2 diff = Vector2.Subtract(position, final_position.Center.ToVector2());
             _direction = Vector2.Normalize(diff);
             _final_position = final_position;
+            _counter = 0;
+            _pause = 0;
+            _angle = angle;
         }
 
         public void Damage(int dmg) {
@@ -45,21 +52,36 @@ namespace TDGame.Managers {
             if (!_arrived)
                 _position += _direction * -2;
 
+            if (_pause < 5) {
+                _pause++;
+            } else {
+                _counter++;
+                _pause = 0;
+            }
+
         }
 
         public void Draw(SpriteBatch spriteBatch) {
+            if (_counter == 4)
+                _counter = 0;
             spriteBatch.Draw(
                 _texture,
-                _position,
-                null,
+                new Rectangle(
+                    (int)_position.X, //952
+                    (int)_position.Y, //81
+                    _width,
+                    _heigth),
+                new Rectangle(
+                    _counter * _width,
+                    0,
+                    _width,
+                    _heigth),
                 Color.White,
-                0.0f,
-                default,
-                new Vector2(1, 1),
-                SpriteEffects.None,
+                _angle - (float) (Math.PI * 0.5f), 
+                new Vector2(_width / 2, _heigth /2), 
+                SpriteEffects.None, 
                 0.25f
             );
         }
-
     }
 }

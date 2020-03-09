@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -6,9 +7,22 @@ using System.Text;
 
 namespace TDGame.Managers {
     public class BulletHitsEnemy {
+
+        private sealed class DamageDisplayer {
+            public Vector2 Position { get; set; }
+            public int Damage { get; set; }
+            public int Counter { get; set; }
+            public DamageDisplayer(Vector2 vec, int dmg, int counter) {
+                Position = vec;
+                Damage = dmg;
+                Counter = counter;
+            }
+        }
+
         public Player P { get; set; }
         public EnemyManager EM { get; set; }
         public BulletManager BM { get; set; }
+        private List<DamageDisplayer> _damage_positioins;
 
         public BulletHitsEnemy(
             ref EnemyManager enemy_manager, 
@@ -19,6 +33,7 @@ namespace TDGame.Managers {
             EM = enemy_manager;
             BM = bullet_manager;
             P = player;
+            _damage_positioins = new List<DamageDisplayer>();
         }
 
         public void Update() {
@@ -26,11 +41,26 @@ namespace TDGame.Managers {
             {
                 foreach(var e in EM.Enemies) 
                 {
-                    Rectangle rect = new Rectangle((int)e._position.X, (int)e._position.Y, 50, 50);
-                    if(rect.Contains(b._position)) {
+                    Rectangle rect = new Rectangle((int)e._position.X - 30, (int)e._position.Y - 25, e._width, e._width); 
+                    if (rect.Contains(b._position)) {
                         e.Damage(P._strength);
                         b._isvalid = false;
+                        _damage_positioins.Add(new DamageDisplayer(new Vector2(b._position.X, b._position.Y), P._strength, 6));
                     }
+                }
+            }
+        }
+
+        public void Draw(SpriteBatch spriteBatch, SpriteFont font) {
+            DamageDisplayer item = null;
+            for(int i = 0; i < _damage_positioins.Count; i++) {
+                item = _damage_positioins[i];
+                if(item.Counter == 0) {
+                    _damage_positioins.RemoveAt(i);
+                    i--;
+                } else {
+                    spriteBatch.DrawString(font, $"- {item.Damage}", item.Position, Color.Red);
+                    item.Counter--;
                 }
             }
         }
