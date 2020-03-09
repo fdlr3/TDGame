@@ -14,13 +14,13 @@ namespace TDGame {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
+        private int HEIGTH = 1080;
+        private int WIDTH = 1920;
+
         private Texture2D _background_texture;
         private Rectangle _map_location;
 
         private SpriteFont _damage_font;
-
-        private int HEIGTH = 1080;
-        private int WIDTH = 1920;
 
         private BulletManager _bullet_manager;
         private Player _player;
@@ -29,35 +29,18 @@ namespace TDGame {
         private EnergyStorageManager _energy_storage_manager;
         private PortalManager _portal_manager;
 
-
-        private double _el_time = 0;
+        private double _fire_bullet_time = 0;
 
         private double _el_spawn_enemy = 0;
 
-        private List<Vector2> portal_location = new List<Vector2>() {
-            new Vector2(200, 20),
-            new Vector2(500, 20),
-            new Vector2(800, 20),
-
-            new Vector2(200, 700),
-            new Vector2(500, 700),
-            new Vector2(800, 700),
-
-            new Vector2(20, 300),
-            new Vector2(1000, 300)
-        };
-
-        private List<Vector2> energy_portal_locations= new List<Vector2>() {
-            new Vector2(350, 300),
-            new Vector2(750, 300)
-        };
+        
 
         public Game1() {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
 
-            this.IsFixedTimeStep = true;//false;
-            this.TargetElapsedTime = System.TimeSpan.FromSeconds(1d / 30d); //60);
+            this.IsFixedTimeStep = true;
+            this.TargetElapsedTime = System.TimeSpan.FromSeconds(1d / 30d);
 
             this.IsMouseVisible = true;
         }
@@ -85,72 +68,91 @@ namespace TDGame {
         protected override void LoadContent() {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            Rectangle win_size = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
             _background_texture = Content.Load<Texture2D>("map");
             _map_location = new Rectangle(0, 0, WIDTH, HEIGTH);
+            _damage_font = Content.Load<SpriteFont>("DamageFont");
 
             /********************************************************/
             /********************INITIALIZE PORTALS******************/
             /********************************************************/
 
             List<Vector2> portal_location = new List<Vector2>() {
-                new Vector2(750, 60),
+                new Vector2(550, 60),
                 new Vector2(1700, 400),
                 new Vector2(100, 750),
                 new Vector2(800, 850)
             };
 
-            _damage_font = Content.Load<SpriteFont>("DamageFont");
+            _portal_manager = new PortalManager(
+                Content.Load<Texture2D>("portal_vecji"),
+                133,
+                150
+            );
 
+            foreach (var a in portal_location)
+                _portal_manager.AddPortal(a);
 
-            Rectangle win_size = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+            /********************************************************/
+            /*****************INITIALIZE ENERGY POINTS***************/
+            /********************************************************/
+
+            List<Vector2> energy_point_locations = new List<Vector2>() {
+                new Vector2(270, 450),
+                new Vector2(1050, 550)
+            };
 
             _energy_storage_manager = new EnergyStorageManager(
-                Content.Load<Texture2D>("portal_vecji"),
-                256,
-                144
+                Content.Load<Texture2D>("energy_point"),
+                100,
+                100
             );
-            foreach(var a in energy_portal_locations)
+
+            foreach(var a in energy_point_locations)
                 _energy_storage_manager.Add(a, 1000);
 
+
+            /********************************************************/
+            /********************INITIALIZE ENEMIES******************/
+            /********************************************************/
+
             _enemy_manager = new EnemyManager(
-                portal_location,
+                ref _portal_manager,
                 ref _energy_storage_manager, 
                 Content.Load<Texture2D>("violet_robot_animated") 
             );
+
+            /********************************************************/
+            /********************INITIALIZE BULLETS******************/
+            /********************************************************/
 
             _bullet_manager = new BulletManager(
                 Content.Load<Texture2D>("okrogel_metek6"), 
                 win_size
             );
 
+            /********************************************************/
+            /********************INITIALIZE PLAYER*******************/
+            /********************************************************/
+
             _player = new Player(
                 Content.Load<Texture2D>("player"), 
                 win_size, 
-                new Vector2(WIDTH / 2, HEIGTH / 2), 
+                new Vector2(700, 500), 
                 60, 
                 50, 
                 40
             );
+
+            /********************************************************/
+            /***************INITIALIZE BULLET HITS ENEMY*************/
+            /********************************************************/
 
             _bullet_hits_enemy = new BulletHitsEnemy(
                 ref _enemy_manager, 
                 ref _bullet_manager,
                 ref _player
             );
-
-            _portal_manager = new PortalManager(
-                Content.Load<Texture2D>("portal_vecji"), 
-                133,
-                150
-            );
-
-            foreach(var a in portal_location) {
-                _portal_manager.AddPortal(a);
-            }
-
-
-
-            //bhe = new BulletHitsEnemy(ref Enemy._enemies, ref Bullet._bullets);
         }
 
         /// <summary>
@@ -167,6 +169,9 @@ namespace TDGame {
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime) {
+            _fire_bullet_time += gameTime.ElapsedGameTime.TotalMilliseconds;
+            _el_spawn_enemy += gameTime.ElapsedGameTime.TotalMilliseconds;
+
             var ks = Keyboard.GetState();
             var ms = Mouse.GetState();
 
@@ -174,12 +179,9 @@ namespace TDGame {
                 Exit();
 
             //fire bullet logic
-            _el_time += gameTime.ElapsedGameTime.TotalMilliseconds;
-            _el_spawn_enemy += gameTime.ElapsedGameTime.TotalMilliseconds;
-           
-            if (ms.LeftButton == ButtonState.Pressed && _el_time > 180) { 
+            if (ms.LeftButton == ButtonState.Pressed && _fire_bullet_time > 180) { 
                 _bullet_manager.Add(_player.GetPosition(), _player.GetDirection());
-                _el_time = 0;
+                _fire_bullet_time = 0;
             }
                 
 
@@ -189,12 +191,17 @@ namespace TDGame {
             }
 
 
-            _player.Update(ks, ms);
-            _bullet_manager.Update();
-            _enemy_manager.Update();
-            _bullet_hits_enemy.Update();
-            _portal_manager.Update();
-            //Debug.WriteLine($"M: ({ms.X}, {ms.Y}) -> BC: {Bullet._bullets.Count} -> Tick: {_tick}");
+            /***********************************/
+            /***************UPDATES*************/
+            /***********************************/
+
+            _player                 .Update(ks, ms);
+            _bullet_manager         .Update();
+            _enemy_manager          .Update();
+            _bullet_hits_enemy      .Update();
+            _portal_manager         .Update();
+            _energy_storage_manager .Update();
+
             base.Update(gameTime);
         }
 
@@ -207,13 +214,14 @@ namespace TDGame {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             spriteBatch.Begin();
-            spriteBatch.Draw(_background_texture, _map_location, Color.White);
-            _portal_manager.Draw(spriteBatch);
-            _bullet_manager.Draw(spriteBatch);
-            _enemy_manager.Draw(spriteBatch);
-            _player.Draw(spriteBatch);
-            _energy_storage_manager.Draw(spriteBatch);
-            _bullet_hits_enemy.Draw(spriteBatch, _damage_font);
+
+            spriteBatch             .Draw(_background_texture, _map_location, Color.White);
+            _portal_manager         .Draw(spriteBatch);
+            _bullet_manager         .Draw(spriteBatch);
+            _enemy_manager          .Draw(spriteBatch);
+            _player                 .Draw(spriteBatch);
+            _energy_storage_manager .Draw(spriteBatch);
+            _bullet_hits_enemy      .Draw(spriteBatch, _damage_font);
 
             spriteBatch.End();
 

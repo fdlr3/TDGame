@@ -27,16 +27,19 @@ namespace TDGame.Managers {
             _velocity = velocity;
         }
 
-        public void Init(Vector2 position, Rectangle final_position, float angle) {
+        public void Init(Vector2 position, Rectangle final_position, Vector2 rand_position, float angle) {
             _position = position;
+            _final_position = final_position;
+
             _isvalid = true;
             _arrived = false;
-            Vector2 diff = Vector2.Subtract(position, final_position.Center.ToVector2());
-            _direction = Vector2.Normalize(diff);
-            _final_position = final_position;
             _counter = 0;
             _pause = 0;
             _angle = angle;
+
+            //calculate direction
+            Vector2 diff = Vector2.Subtract(position, rand_position);
+            _direction = Vector2.Normalize(diff);
         }
 
         public void Damage(int dmg) {
@@ -67,8 +70,8 @@ namespace TDGame.Managers {
             spriteBatch.Draw(
                 _texture,
                 new Rectangle(
-                    (int)_position.X, //952
-                    (int)_position.Y, //81
+                    (int)_position.X,
+                    (int)_position.Y,
                     _width,
                     _heigth),
                 new Rectangle(

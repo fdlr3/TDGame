@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using System.Linq;
 
 namespace TDGame.Managers {
     public class BulletHitsEnemy {
@@ -45,7 +46,14 @@ namespace TDGame.Managers {
                     if (rect.Contains(b._position)) {
                         e.Damage(P._strength);
                         b._isvalid = false;
-                        _damage_positioins.Add(new DamageDisplayer(new Vector2(b._position.X, b._position.Y), P._strength, 6));
+                        Vector2 loc_vec = new Vector2(b._position.X, b._position.Y);
+
+                        //reposition text if they overlap
+                        if(_damage_positioins.FirstOrDefault(x => x.Position == loc_vec) != null) {
+                            loc_vec.X -= 5.0f;
+                            loc_vec.Y -= 5.0f;
+                        }
+                        _damage_positioins.Add(new DamageDisplayer(loc_vec, P._strength, 6));
                     }
                 }
             }
