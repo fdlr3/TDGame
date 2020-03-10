@@ -10,6 +10,8 @@ namespace TDGame.Managers {
         private Rectangle _final_position;
         private Vector2 _direction;
         private bool _arrived;
+        private Tuple<HealthBar, HealthBar> _healthbar;
+        public int _max_health;
         public int _health;
         public int _strength;
         public int _velocity;
@@ -17,17 +19,26 @@ namespace TDGame.Managers {
         public int _pause;
         public float _angle = .0f;
         
+        
 
 
         public Enemy(Texture2D texture, int w, int h, int health, int strength, int velocity)
             : base(texture, w, h) {
             _arrived = false;
             _health = health;
+            _max_health = health;
             _strength = strength;
             _velocity = velocity;
         }
 
-        public void Init(Vector2 position, Rectangle final_position, Vector2 rand_position, float angle) {
+        public void Init
+            (
+                Vector2 position, 
+                Rectangle final_position, 
+                Vector2 rand_position, 
+                float angle,
+                HealthBar roothp
+            ) {
             _position = position;
             _final_position = final_position;
 
@@ -36,6 +47,14 @@ namespace TDGame.Managers {
             _counter = 0;
             _pause = 0;
             _angle = angle;
+
+            _healthbar = new Tuple<HealthBar, HealthBar>
+                (
+                    roothp.Clone() as HealthBar,
+                    roothp.Clone() as HealthBar
+                );
+            _healthbar.Item1.SetColor(Color.Red);
+            _healthbar.Item2.SetColor(Color.Black);
 
             //calculate direction
             Vector2 diff = Vector2.Subtract(position, rand_position);
@@ -61,6 +80,10 @@ namespace TDGame.Managers {
                 _counter++;
                 _pause = 0;
             }
+            Vector2 hp_pos = new Vector2(_position.X - (_width / 2), (_position.Y - _heigth / 2));
+            _healthbar.Item1.Update(hp_pos);
+            _healthbar.Item2.Update(hp_pos);
+            _healthbar.Item1.ReduceLenght((float)_health / (float)_max_health);
 
         }
 
@@ -85,6 +108,9 @@ namespace TDGame.Managers {
                 SpriteEffects.None, 
                 0.25f
             );
+
+            _healthbar.Item2.Draw(spriteBatch);
+            _healthbar.Item1.Draw(spriteBatch);
         }
     }
 }

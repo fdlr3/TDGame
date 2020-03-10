@@ -54,6 +54,7 @@ namespace TDGame.Managers {
                             loc_vec.Y -= 5.0f;
                         }
                         _damage_positioins.Add(new DamageDisplayer(loc_vec, P._strength, 6));
+                        break;
                     }
                 }
             }

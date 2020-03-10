@@ -14,14 +14,25 @@ namespace TDGame {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
+        private HealthBar _hp_root;
+
         private int HEIGTH = 1080;
         private int WIDTH = 1920;
 
+        /****************************/
+        /*********BACKGROUND*********/
+        /****************************/
         private Texture2D _background_texture;
         private Rectangle _map_location;
 
+        /****************************/
+        /********FONT SPRITES********/
+        /****************************/
         private SpriteFont _damage_font;
 
+        /****************************/
+        /**********MANAGERS**********/
+        /****************************/
         private BulletManager _bullet_manager;
         private Player _player;
         private EnemyManager _enemy_manager;
@@ -29,8 +40,10 @@ namespace TDGame {
         private EnergyStorageManager _energy_storage_manager;
         private PortalManager _portal_manager;
 
+        /****************************/
+        /***********TIMERS***********/
+        /****************************/
         private double _fire_bullet_time = 0;
-
         private double _el_spawn_enemy = 0;
 
         
@@ -38,11 +51,9 @@ namespace TDGame {
         public Game1() {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-
-            this.IsFixedTimeStep = true;
-            this.TargetElapsedTime = System.TimeSpan.FromSeconds(1d / 30d);
-
-            this.IsMouseVisible = true;
+            IsFixedTimeStep = true;
+            TargetElapsedTime = System.TimeSpan.FromSeconds(1d / 30d);
+            IsMouseVisible = true;
         }
 
         /// <summary>
@@ -72,6 +83,12 @@ namespace TDGame {
             _background_texture = Content.Load<Texture2D>("map");
             _map_location = new Rectangle(0, 0, WIDTH, HEIGTH);
             _damage_font = Content.Load<SpriteFont>("DamageFont");
+
+            _hp_root = new HealthBar(
+                Content.Load<Texture2D>("hp_50"),
+                50,
+                4
+            );
 
             /********************************************************/
             /********************INITIALIZE PORTALS******************/
@@ -119,7 +136,8 @@ namespace TDGame {
             _enemy_manager = new EnemyManager(
                 ref _portal_manager,
                 ref _energy_storage_manager, 
-                Content.Load<Texture2D>("violet_robot_animated") 
+                Content.Load<Texture2D>("violet_robot_animated"),
+                _hp_root
             );
 
             /********************************************************/
@@ -153,6 +171,7 @@ namespace TDGame {
                 ref _bullet_manager,
                 ref _player
             );
+
         }
 
         /// <summary>

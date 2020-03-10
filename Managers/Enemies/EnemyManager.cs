@@ -13,14 +13,25 @@ namespace TDGame.Managers {
     public class EnemyManager {
         private static Random _rand;
         private Enemy _rootEnemy;
+        private HealthBar _roothp;
+
         public List<Enemy> Enemies { get; set; }
 
         private PortalManager _PM;
         private EnergyStorageManager _EM;
 
-        public EnemyManager(ref PortalManager portal_manager, ref EnergyStorageManager energy_manager, Texture2D texture) {
+        public EnemyManager
+            (
+                ref PortalManager portal_manager,
+                ref EnergyStorageManager 
+                energy_manager, 
+                Texture2D texture,
+                HealthBar hp
+            ) 
+            {
             _EM = energy_manager;
             _PM = portal_manager;
+            _roothp = hp;
 
             _rootEnemy = new Enemy(texture, 48, 50, 200, 10, -5);
             _rand = new Random();
@@ -86,7 +97,7 @@ namespace TDGame.Managers {
             var cam_v = final_loc._position - _pos_center.Center.ToVector2();
             monster_angle = (float)Math.Atan2(cam_v.Y, cam_v.X);
 
-            x.Init(center_spawn, final_position, rand_point, monster_angle);
+            x.Init(center_spawn, final_position, rand_point, monster_angle, _roothp);
             Enemies.Add(x);
         }
 
