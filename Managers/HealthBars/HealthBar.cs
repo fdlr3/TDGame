@@ -17,7 +17,9 @@ namespace TDGame.Managers {
         }
 
         public void SetColor(Color color) => _color = color;
-        public void ReduceLenght(float red_length) => _red_length = red_length;
+        public void ReduceLenght(float red_length) 
+            => _red_length = red_length >= 0 ? red_length : 0.0f;
+
         public void Update(Vector2 position) => _position = position;
 
         public void Draw(SpriteBatch spriteBatch) {
@@ -42,8 +44,6 @@ namespace TDGame.Managers {
                 SpriteEffects.None,
                 1.0f
             );
-            if(_red_length != 1.0f)
-                Debug.WriteLine($"w/l {_red_length} => {_width * _red_length}");
         }
 
     }

@@ -14,7 +14,8 @@ namespace TDGame {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        private HealthBar _hp_root;
+        private HealthBar _hp50_root;
+        private HealthBar _hp250_root;
 
         private int HEIGTH = 1080;
         private int WIDTH = 1920;
@@ -80,11 +81,25 @@ namespace TDGame {
             Rectangle win_size = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
             _damage_font = Content.Load<SpriteFont>("DamageFont");
 
-            _hp_root = new HealthBar(
+            /********************************************************/
+            /********************INITIALIZE HEALTHBAR****************/
+            /********************************************************/
+
+            _hp50_root = new HealthBar(
                 Content.Load<Texture2D>("hp_50"),
                 50,
                 4
             );
+
+            _hp250_root = new HealthBar(
+                Content.Load<Texture2D>("hp_250"),
+                250,
+                6
+            );
+
+            /********************************************************/
+            /*******************INITIALIZE BACKGROUND****************/
+            /********************************************************/
 
             _background_manager = new BackgroundManager
                 (
@@ -138,21 +153,26 @@ namespace TDGame {
             /*****************INITIALIZE ENERGY POINTS***************/
             /********************************************************/
 
-            List<Vector2> energy_point_locations = new List<Vector2>() {
-                new Vector2(250, 300),
-                new Vector2(1000, 500)
-            };
-
             _energy_storage_manager = new EnergyStorageManager(
                 Content.Load<Texture2D>("energy_point"),
                 214,
-                200
-                
+                200, 
+                _hp250_root
             );
 
-            foreach(var a in energy_point_locations)
-                _energy_storage_manager.Add(a, 1000);
+            _energy_storage_manager.Add
+                (
+                new Vector2(250, 300), 
+                new Vector2((WIDTH / 4) + 35, 40), 
+                2000
+                );
 
+            _energy_storage_manager.Add
+                (
+                new Vector2(1000, 500), 
+                new Vector2((WIDTH / 4 * 2) + 35, 40), 
+                2000
+                );
 
             /********************************************************/
             /********************INITIALIZE ENEMIES******************/
@@ -162,28 +182,28 @@ namespace TDGame {
                 ref _portal_manager,
                 ref _energy_storage_manager, 
                 Content.Load<Texture2D>("enemy_1"),
-                _hp_root, 48, 50, 30, 150, 7, 4
+                _hp50_root, 48, 50, 30, 150, 7, 4
             ));
 
             _enemy_managers.Add("enemy2", new EnemyManager(
                 ref _portal_manager,
                 ref _energy_storage_manager,
                 Content.Load<Texture2D>("enemy_2"),
-                _hp_root, 50, 50, 30, 200, 8, 5
+                _hp50_root, 50, 50, 30, 200, 8, 5
             ));
 
             _enemy_managers.Add("enemy3", new EnemyManager(
                 ref _portal_manager,
                 ref _energy_storage_manager,
                 Content.Load<Texture2D>("enemy_3"),
-                _hp_root, 104, 110, 30, 500, 2, 2
+                _hp50_root, 104, 110, 30, 500, 2, 2
             ));
 
             _enemy_managers.Add("enemy4", new EnemyManager(
                 ref _portal_manager,
                 ref _energy_storage_manager,
                 Content.Load<Texture2D>("enemy_4"),
-                _hp_root, 55, 100, 30, 300, 8, 5
+                _hp50_root, 55, 100, 30, 300, 8, 5
             ));
 
             /********************************************************/
@@ -222,7 +242,7 @@ namespace TDGame {
             /******************INITIALIZE WAVE MANAGER***************/
             /********************************************************/
 
-            _wave_manager = new WaveManager(ref _enemy_managers, 5000, 2000);
+            _wave_manager = new WaveManager(ref _enemy_managers, 5000, 1000);
 
         }
 
@@ -255,6 +275,11 @@ namespace TDGame {
                 _fire_bullet_time = 0;
             }
 
+            //GAME OVER
+            if(_energy_storage_manager._energy_storages.Count == 0) {
+                Exit();
+            }
+
 
             /***********************************/
             /***************UPDATES*************/
@@ -268,7 +293,7 @@ namespace TDGame {
             _energy_storage_manager .Update();
             _enemy_managers.Values
                 .ToList()
-                .ForEach(x => x     .Update(ref Highscore));
+                .ForEach(x => x     .Update(ref Highscore, gameTime));
             _wave_manager           .Update(gameTime, ref Highscore);
 
             base.Update(gameTime);

@@ -43,6 +43,7 @@ namespace TDGame.Managers {
         }
 
         public void Add() {
+            if (_EM._energy_storages.Count == 0) return;
             var x = _rootEnemy.Clone() as Enemy;
             int sel_spawn = _rand.Next(0, _PM._portals.Count);
 
@@ -101,13 +102,76 @@ namespace TDGame.Managers {
             var cam_v = final_loc._position - _pos_center.Center.ToVector2();
             monster_angle = (float)Math.Atan2(cam_v.Y, cam_v.X);
 
-            x.Init(center_spawn, final_position, rand_point, monster_angle, _roothp);
+            x.Init(center_spawn, final_position, rand_point, monster_angle, _roothp, ref final_loc);
             Enemies.Add(x);
         }
 
-        public void Update(ref int Highscore) {
+        public void Redirect(Enemy enemy) {
+            if (_EM._energy_storages.Count == 0) return;
+            int sel_spawn = _rand.Next(0, _PM._portals.Count);
+
+            //calculate closest energy point
+            int j = 0;
+            float dist = float.MaxValue;
+
+            for (int i = 0; i < _EM._energy_storages.Count; i++) {
+                var es = _EM._energy_storages[i];
+                Rectangle es_center = new Rectangle((int)es._position.X, (int)es._position.Y, es._width, es._heigth);
+                float cur_dist = Vector2.Distance(_PM._portals[sel_spawn]._position, es_center.Center.ToVector2());
+
+                if (cur_dist < dist) {
+                    dist = cur_dist;
+                    j = i;
+                }
+            }
+
+            //calculate start point
+            Portal selected_portal = _PM._portals[sel_spawn];
+            Vector2 center_spawn = new Rectangle(
+                (int)selected_portal._position.X,
+                (int)selected_portal._position.Y,
+                selected_portal._width,
+                selected_portal._heigth
+            ).Center.ToVector2();
+
+            var final_loc = _EM._energy_storages[j];
+
+            //calculate final location
+            Rectangle final_position = new Rectangle(
+                (int)final_loc._position.X,
+                (int)final_loc._position.Y,
+                final_loc._width,
+                final_loc._heigth
+            );
+            final_position.Inflate(
+                (int)-(final_loc._width * 0.25f),
+                (int)-(final_loc._heigth * 0.25f)
+            );
+
+            //get random point in final location
+            Vector2 rand_point = new Vector2(
+                _rand.Next(final_position.X, final_position.X + final_position.Width),
+                _rand.Next(final_position.Y, final_position.Y + final_position.Height)
+            );
+
+            final_position.Inflate(
+                (int)(final_loc._width * 0.25f),
+                (int)(final_loc._heigth * 0.25f)
+            );
+
+            //calculate angle
+            float monster_angle = .0f;
+            var _pos_center = new Rectangle((int)center_spawn.X, (int)center_spawn.Y, _rootEnemy._width, _rootEnemy._heigth);
+            var cam_v = final_loc._position - _pos_center.Center.ToVector2();
+            monster_angle = (float)Math.Atan2(cam_v.Y, cam_v.X);
+
+            enemy._arrived = false;
+            enemy.Init(center_spawn, final_position, rand_point, monster_angle, _roothp, ref final_loc);
+        }
+
+        public void Update(ref int Highscore, GameTime gameTime) {
             for (int i = 0; i < Enemies.Count; i++) {
-                Enemies[i].Update();
+                Enemies[i].Update(gameTime);
                 if (!Enemies[i]._isvalid) {
                     Highscore = Enemies[i]._max_health / 10;
                     Enemies.RemoveAt(i);

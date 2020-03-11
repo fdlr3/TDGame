@@ -9,19 +9,19 @@ namespace TDGame.Managers {
     public class Enemy : SpriteObject {
         private Rectangle _final_position;
         private Vector2 _direction;
-        private bool _arrived;
+        public EnergyStorage _ES;
         private Tuple<HealthBar, HealthBar> _healthbar;
+        public bool _arrived;
         public int _max_health;
         public int _health;
         public int _strength;
+        public double _damage_counter;
         public int _velocity;
         public int _counter;
         public int _pause;
         public int _animation_count;
         public float _angle = .0f;
-        
-        
-
+  
 
         public Enemy(Texture2D texture, int w, int h, int health, int strength, int velocity, int animation_count)
             : base(texture, w, h) {
@@ -39,15 +39,17 @@ namespace TDGame.Managers {
                 Rectangle final_position, 
                 Vector2 rand_position, 
                 float angle,
-                HealthBar roothp
+                HealthBar roothp,
+                ref EnergyStorage ES
             ) {
             _position = position;
             _final_position = final_position;
-
+            _ES = ES;
             _isvalid = true;
             _arrived = false;
             _counter = 0;
             _pause = 0;
+            _damage_counter = 0;
             _angle = angle;
 
             _healthbar = new Tuple<HealthBar, HealthBar>
@@ -69,10 +71,19 @@ namespace TDGame.Managers {
                 _isvalid = false;
         }
 
-        public void Update() {
+        public void Update(GameTime gameTime) {
             //todo go till _destination is achieved
-            if (_final_position.Contains(_position))
+            if (_final_position.Contains(_position)) {
                 _arrived = true;
+                _damage_counter += gameTime.ElapsedGameTime.TotalMilliseconds;
+                if(_damage_counter > 1000) {
+                    _ES.Damage(_strength);
+                    _damage_counter = 0;
+                }
+            }
+            if (!_ES._isvalid)
+                _isvalid = false;
+                
             if (!_arrived)
                 _position += _direction * -2;
 

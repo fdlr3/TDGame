@@ -23,6 +23,7 @@ namespace TDGame.Managers {
             SpawnOffset = spawn_offset;
             _enemy_queue = new Queue<string>();
             rnd = new Random();
+            GenerateEnemyQueue();
         }
 
         public void Update(GameTime gameTime, ref int add_hs) {

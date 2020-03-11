@@ -104,6 +104,18 @@
 /processorParam:TextureFormat=Color
 /build:highscore_wave.png
 
+#begin hp_250.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:hp_250.png
+
 #begin hp_50.png
 /importer:TextureImporter
 /processor:TextureProcessor

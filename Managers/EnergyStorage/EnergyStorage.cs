@@ -6,21 +6,37 @@ using System.Text;
 
 namespace TDGame.Managers {
     public class EnergyStorage : SpriteObject {
+        private Tuple<HealthBar, HealthBar> _healthbar;
+        private int _max_health;
         private int _health;
         public int _counter;
         public int _pause;
 
         public EnergyStorage(Texture2D texture, int w, int h)
             : base(texture, w, h) {
-
+            _isvalid = true;
         }
 
-        public void Init(Vector2 position, int health) {
+        public void Init(Vector2 position, Vector2 hp_pos, HealthBar hproot, int health) {
             _position = position;
             _health = health;
+            _max_health = health;
             _counter = 0;
             _pause = 0;
+            _isvalid = true;
+
+            _healthbar = new Tuple<HealthBar, HealthBar>
+                (
+                    hproot.Clone() as HealthBar,
+                    hproot.Clone() as HealthBar
+                );
+            _healthbar.Item1.SetColor(Color.Red);
+            _healthbar.Item2.SetColor(Color.Black);
+            _healthbar.Item1.Update(hp_pos);
+            _healthbar.Item2.Update(hp_pos);
         }
+
+        public void Damage(int dmg) => _health -= dmg;
 
         public void Update() {
             if (_pause < 3) {
@@ -28,6 +44,10 @@ namespace TDGame.Managers {
             } else {
                 _counter++;
                 _pause = 0;
+            }
+            _healthbar.Item1.ReduceLenght((float)_health / (float)_max_health);
+            if(_health <= 0) {
+                _isvalid = false;
             }
         }
 
@@ -52,6 +72,8 @@ namespace TDGame.Managers {
                 SpriteEffects.None,
                 0.25f
             );
+            _healthbar.Item2.Draw(spriteBatch);
+            _healthbar.Item1.Draw(spriteBatch);
         }
     }
 }
