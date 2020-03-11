@@ -105,10 +105,11 @@ namespace TDGame.Managers {
             Enemies.Add(x);
         }
 
-        public void Update() {
+        public void Update(ref int Highscore) {
             for (int i = 0; i < Enemies.Count; i++) {
                 Enemies[i].Update();
                 if (!Enemies[i]._isvalid) {
+                    Highscore = Enemies[i]._max_health / 10;
                     Enemies.RemoveAt(i);
                     i--;
                 }

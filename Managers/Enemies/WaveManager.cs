@@ -25,10 +25,11 @@ namespace TDGame.Managers {
             rnd = new Random();
         }
 
-        public void Update(GameTime gameTime) {
+        public void Update(GameTime gameTime, ref int add_hs) {
             OffsetCounter += gameTime.ElapsedGameTime.TotalMilliseconds;
+            Highscore += add_hs;
 
-            if(_enemy_queue.Count > 0) {
+            if (_enemy_queue.Count > 0) {
                 if (OffsetCounter > SpawnOffset) {
                     _EM[_enemy_queue.Dequeue()].Add();
                     OffsetCounter = 0;

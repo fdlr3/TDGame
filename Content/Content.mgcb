@@ -116,6 +116,13 @@
 /processorParam:TextureFormat=Color
 /build:hp_50.png
 
+#begin hs_wave.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:hs_wave.spritefont
+
 #begin left_energy_hp.png
 /importer:TextureImporter
 /processor:TextureProcessor

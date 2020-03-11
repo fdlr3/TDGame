@@ -20,12 +20,6 @@ namespace TDGame {
         private int WIDTH = 1920;
 
         /****************************/
-        /*********BACKGROUND*********/
-        /****************************/
-        private Texture2D _background_texture;
-        private Rectangle _map_location;
-
-        /****************************/
         /********FONT SPRITES********/
         /****************************/
         private SpriteFont _damage_font;
@@ -43,6 +37,7 @@ namespace TDGame {
         private EnergyStorageManager _energy_storage_manager;
         private PortalManager _portal_manager;
         private WaveManager _wave_manager;
+        private BackgroundManager _background_manager;
 
         /****************************/
         /***********TIMERS***********/
@@ -83,8 +78,6 @@ namespace TDGame {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
             Rectangle win_size = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
-            _background_texture = Content.Load<Texture2D>("map");
-            _map_location = new Rectangle(0, 0, WIDTH, HEIGTH);
             _damage_font = Content.Load<SpriteFont>("DamageFont");
 
             _hp_root = new HealthBar(
@@ -93,15 +86,43 @@ namespace TDGame {
                 4
             );
 
+            _background_manager = new BackgroundManager
+                (
+                    Content.Load<SpriteFont>("hs_wave"), 
+                    new Vector2(1680, 75), 
+                    new Vector2(1770, 28)
+                );
+
+            _background_manager.AddTexture
+                (
+                    Content.Load<Texture2D>("map"),
+                    new Vector2(0, 0)
+                );
+            _background_manager.AddTexture
+                (
+                    Content.Load<Texture2D>("highscore_wave"),
+                    new Vector2(WIDTH - 360, 0)
+                );
+            _background_manager.AddTexture
+               (
+                   Content.Load<Texture2D>("left_energy_hp"),
+                   new Vector2(WIDTH / 4, 0)
+               );
+            _background_manager.AddTexture
+               (
+                   Content.Load<Texture2D>("right_energy_hp"),
+                   new Vector2(WIDTH / 4 * 2, 0)
+               );
+
             /********************************************************/
             /********************INITIALIZE PORTALS******************/
             /********************************************************/
 
             List<Vector2> portal_location = new List<Vector2>() {
-                new Vector2(550, 60),
-                new Vector2(1700, 400),
-                new Vector2(100, 750),
-                new Vector2(800, 850)
+                new Vector2(700, 60),
+                new Vector2(1750, 300),
+                new Vector2(80, 850),
+                new Vector2(750, 850)
             };
 
             _portal_manager = new PortalManager(
@@ -118,14 +139,15 @@ namespace TDGame {
             /********************************************************/
 
             List<Vector2> energy_point_locations = new List<Vector2>() {
-                new Vector2(270, 450),
-                new Vector2(1050, 550)
+                new Vector2(250, 300),
+                new Vector2(1000, 500)
             };
 
             _energy_storage_manager = new EnergyStorageManager(
                 Content.Load<Texture2D>("energy_point"),
-                100,
-                100
+                214,
+                200
+                
             );
 
             foreach(var a in energy_point_locations)
@@ -219,6 +241,7 @@ namespace TDGame {
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime) {
             _fire_bullet_time += gameTime.ElapsedGameTime.TotalMilliseconds;
+            int Highscore = 0;
 
             var ks = Keyboard.GetState();
             var ms = Mouse.GetState();
@@ -236,17 +259,17 @@ namespace TDGame {
             /***********************************/
             /***************UPDATES*************/
             /***********************************/
-            _wave_manager           .Update(gameTime);
+            
             _player                 .Update(ks, ms);
+            _background_manager     .Update(_wave_manager.WaveCount, _wave_manager.Highscore);
             _bullet_manager         .Update();
             _bullet_hits_enemy      .Update();
             _portal_manager         .Update();
             _energy_storage_manager .Update();
             _enemy_managers.Values
                 .ToList()
-                .ForEach(x => x     .Update());
-
-
+                .ForEach(x => x     .Update(ref Highscore));
+            _wave_manager           .Update(gameTime, ref Highscore);
 
             base.Update(gameTime);
         }
@@ -261,7 +284,7 @@ namespace TDGame {
 
             spriteBatch.Begin();
 
-            spriteBatch             .Draw(_background_texture, _map_location, Color.White);
+            _background_manager     .Draw(spriteBatch);
             _portal_manager         .Draw(spriteBatch);
             _bullet_manager         .Draw(spriteBatch);
             _enemy_managers.Values
@@ -270,7 +293,7 @@ namespace TDGame {
             _player                 .Draw(spriteBatch);
             _energy_storage_manager .Draw(spriteBatch);
             _bullet_hits_enemy      .Draw(spriteBatch, _damage_font);
-
+            
             spriteBatch.End();
 
 
