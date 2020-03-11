@@ -26,14 +26,18 @@ namespace TDGame.Managers {
                 ref EnergyStorageManager 
                 energy_manager, 
                 Texture2D texture,
-                HealthBar hp
+                HealthBar hp,
+                int w, int h,
+                int strength, int health,
+                int velocity,
+                int animaction_count
             ) 
             {
             _EM = energy_manager;
             _PM = portal_manager;
             _roothp = hp;
 
-            _rootEnemy = new Enemy(texture, 48, 50, 200, 10, -5);
+            _rootEnemy = new Enemy(texture, w, h, health, strength, -Math.Abs(velocity), animaction_count);
             _rand = new Random();
             Enemies = new List<Enemy>();
         }

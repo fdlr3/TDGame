@@ -17,18 +17,20 @@ namespace TDGame.Managers {
         public int _velocity;
         public int _counter;
         public int _pause;
+        public int _animation_count;
         public float _angle = .0f;
         
         
 
 
-        public Enemy(Texture2D texture, int w, int h, int health, int strength, int velocity)
+        public Enemy(Texture2D texture, int w, int h, int health, int strength, int velocity, int animation_count)
             : base(texture, w, h) {
             _arrived = false;
             _health = health;
             _max_health = health;
             _strength = strength;
             _velocity = velocity;
+            _animation_count = animation_count;
         }
 
         public void Init
@@ -88,7 +90,7 @@ namespace TDGame.Managers {
         }
 
         public void Draw(SpriteBatch spriteBatch) {
-            if (_counter == 4)
+            if (_counter == _animation_count)
                 _counter = 0;
             spriteBatch.Draw(
                 _texture,

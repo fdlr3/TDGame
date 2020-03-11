@@ -33,20 +33,22 @@ namespace TDGame {
         /****************************/
         /**********MANAGERS**********/
         /****************************/
+        private Dictionary<string, EnemyManager> _enemy_managers;
+
+
         private BulletManager _bullet_manager;
         private Player _player;
-        private EnemyManager _enemy_manager;
+        
         private BulletHitsEnemy _bullet_hits_enemy;
         private EnergyStorageManager _energy_storage_manager;
         private PortalManager _portal_manager;
+        private WaveManager _wave_manager;
 
         /****************************/
         /***********TIMERS***********/
         /****************************/
         private double _fire_bullet_time = 0;
-        private double _el_spawn_enemy = 0;
 
-        
 
         public Game1() {
             graphics = new GraphicsDeviceManager(this);
@@ -68,6 +70,7 @@ namespace TDGame {
             graphics.PreferredBackBufferHeight = HEIGTH;
             graphics.IsFullScreen = false;
             graphics.ApplyChanges();
+            _enemy_managers = new Dictionary<string, EnemyManager>();
 
             base.Initialize();
         }
@@ -133,12 +136,33 @@ namespace TDGame {
             /********************INITIALIZE ENEMIES******************/
             /********************************************************/
 
-            _enemy_manager = new EnemyManager(
+            _enemy_managers.Add("enemy1", new EnemyManager(
                 ref _portal_manager,
                 ref _energy_storage_manager, 
-                Content.Load<Texture2D>("violet_robot_animated"),
-                _hp_root
-            );
+                Content.Load<Texture2D>("enemy_1"),
+                _hp_root, 48, 50, 30, 150, 7, 4
+            ));
+
+            _enemy_managers.Add("enemy2", new EnemyManager(
+                ref _portal_manager,
+                ref _energy_storage_manager,
+                Content.Load<Texture2D>("enemy_2"),
+                _hp_root, 50, 50, 30, 200, 8, 5
+            ));
+
+            _enemy_managers.Add("enemy3", new EnemyManager(
+                ref _portal_manager,
+                ref _energy_storage_manager,
+                Content.Load<Texture2D>("enemy_3"),
+                _hp_root, 104, 110, 30, 500, 2, 2
+            ));
+
+            _enemy_managers.Add("enemy4", new EnemyManager(
+                ref _portal_manager,
+                ref _energy_storage_manager,
+                Content.Load<Texture2D>("enemy_4"),
+                _hp_root, 55, 100, 30, 300, 8, 5
+            ));
 
             /********************************************************/
             /********************INITIALIZE BULLETS******************/
@@ -167,10 +191,16 @@ namespace TDGame {
             /********************************************************/
 
             _bullet_hits_enemy = new BulletHitsEnemy(
-                ref _enemy_manager, 
+                ref _enemy_managers, 
                 ref _bullet_manager,
                 ref _player
             );
+
+            /********************************************************/
+            /******************INITIALIZE WAVE MANAGER***************/
+            /********************************************************/
+
+            _wave_manager = new WaveManager(ref _enemy_managers, 5000, 2000);
 
         }
 
@@ -189,7 +219,6 @@ namespace TDGame {
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime) {
             _fire_bullet_time += gameTime.ElapsedGameTime.TotalMilliseconds;
-            _el_spawn_enemy += gameTime.ElapsedGameTime.TotalMilliseconds;
 
             var ks = Keyboard.GetState();
             var ms = Mouse.GetState();
@@ -202,24 +231,22 @@ namespace TDGame {
                 _bullet_manager.Add(_player.GetPosition(), _player.GetDirection());
                 _fire_bullet_time = 0;
             }
-                
-
-            if(_el_spawn_enemy > 1000) {
-                _enemy_manager.Add();
-                _el_spawn_enemy = 0;
-            }
 
 
             /***********************************/
             /***************UPDATES*************/
             /***********************************/
-
+            _wave_manager           .Update(gameTime);
             _player                 .Update(ks, ms);
             _bullet_manager         .Update();
-            _enemy_manager          .Update();
             _bullet_hits_enemy      .Update();
             _portal_manager         .Update();
             _energy_storage_manager .Update();
+            _enemy_managers.Values
+                .ToList()
+                .ForEach(x => x     .Update());
+
+
 
             base.Update(gameTime);
         }
@@ -237,7 +264,9 @@ namespace TDGame {
             spriteBatch             .Draw(_background_texture, _map_location, Color.White);
             _portal_manager         .Draw(spriteBatch);
             _bullet_manager         .Draw(spriteBatch);
-            _enemy_manager          .Draw(spriteBatch);
+            _enemy_managers.Values
+                .ToList()
+                .ForEach(x => x     .Draw(spriteBatch));
             _player                 .Draw(spriteBatch);
             _energy_storage_manager .Draw(spriteBatch);
             _bullet_hits_enemy      .Draw(spriteBatch, _damage_font);
