@@ -16,14 +16,13 @@ namespace TDGame {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        
         public CGameState _state = CGameState.MainScreen;
 
         /****************************/
         /***********WINDOW***********/
         /****************************/
-        private int HEIGTH = 1080;
-        private int WIDTH = 1920;
+        private int HEIGTH  = 1080;
+        private int WIDTH   = 1920;
         private Rectangle win_size;
 
         /****************************/
@@ -35,9 +34,10 @@ namespace TDGame {
         /****************************/
         /**********MANAGERS**********/
         /****************************/
+        private GameOverScreen                      _gameoverscreen;
+        private MainScreen                          _mainscreen;
         private HealthBar                           _hp50_root;
         private HealthBar                           _hp250_root;
-        private MainScreen                          _mainscreen;
         private Dictionary<string, EnemyManager>    _enemy_managers;
         private BulletManager                       _bullet_manager;
         private Player                              _player;
@@ -63,6 +63,8 @@ namespace TDGame {
         }
 
         public void LoadMainScreen() {
+            _mainscreen = null;
+
             _mainscreen = new MainScreen();
             _mainscreen.AddButton(new Button
                 (
@@ -85,8 +87,39 @@ namespace TDGame {
                 );
         }
 
+        public void LoadGameOver(int highscore) {
+            _gameoverscreen = null;
+
+            _gameoverscreen = new GameOverScreen();
+            _gameoverscreen.AddButton(new Button
+                (
+                    _tstorage["play"],
+                    new Vector2(610, 400),
+                    700, 200,
+                    CGameState.StartGame
+                ));
+
+            _gameoverscreen.AddText
+                (
+                    _fstorage["gameover_font"],
+                    new Vector2(460, 100),
+                    highscore.ToString()
+                );
+        }
+
         public void LoadGame() 
         {
+            _enemy_managers.Clear();
+            _hp50_root = null;
+            _hp250_root = null;
+            _bullet_manager = null;
+            _player = null;
+            _bullet_hits_enemy = null;
+            _energy_storage_manager = null;
+            _portal_manager = null;
+            _wave_manager = null;
+            _background_manager = null;
+
             #region HealthBar LoadContent
             _hp50_root = new HealthBar(
                 _tstorage["hp_50"],
@@ -287,8 +320,9 @@ namespace TDGame {
 
             _fstorage = new Dictionary<string, SpriteFont>() 
             {
-                { "DamageFont", Content.Load<SpriteFont>("DamageFont") },
-                { "hs_wave",    Content.Load<SpriteFont>("hs_wave") }
+                { "DamageFont",     Content.Load<SpriteFont>("DamageFont") },
+                { "hs_wave",        Content.Load<SpriteFont>("hs_wave") },
+                { "gameover_font",  Content.Load<SpriteFont>("gameover_font") }
             };
 
             LoadMainScreen();
@@ -324,20 +358,9 @@ namespace TDGame {
                     }
                     break;
                 case CGameState.StartGame:
-                    _enemy_managers.Clear();
-                    _hp50_root              = null;
-                    _hp250_root             = null;
-                    _bullet_manager         = null;
-                    _player                 = null;
-                    _bullet_hits_enemy      = null;
-                    _energy_storage_manager = null;
-                    _portal_manager         = null;
-                    _wave_manager           = null;
-                    _background_manager     = null;
                     LoadGame();
                     break;
                 case CGameState.Playing:
-
                     if (ms.LeftButton == ButtonState.Pressed && _fire_bullet_time > 180) {
                         _bullet_manager.Add(_player.GetPosition(), _player.GetDirection());
                         _fire_bullet_time = 0;
@@ -355,12 +378,19 @@ namespace TDGame {
                     _wave_manager           .Update(gameTime, ref Highscore);
 
                     //game over 
-                    if (_energy_storage_manager._energy_storages.Count == 0)
+                    if (_energy_storage_manager._energy_storages.Count == 0) {
                         _state = CGameState.Gameover;
+                        goto hack;
+                    }
                     break;
                 case CGameState.Gameover:
-
-                    //add button to navigate to main 
+                    if (_gameoverscreen == null)
+                        LoadGameOver(Highscore);
+                    ret = _gameoverscreen.Update(ms);
+                    if (ret.HasValue && ret.Value == CGameState.StartGame) {
+                        _state = ret.Value;
+                        goto hack;
+                    }
                     break;
                 case CGameState.Quit:
                     Exit();
@@ -397,11 +427,12 @@ namespace TDGame {
                     _player                 .Draw(spriteBatch);
                     _energy_storage_manager .Draw(spriteBatch);
                     _bullet_hits_enemy      .Draw(spriteBatch);
+
+                    if(_state == CGameState.Gameover)
+                        _gameoverscreen.Draw(spriteBatch);
                     break;
             }
 
-
-            
             spriteBatch.End();
 
 

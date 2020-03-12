@@ -104,6 +104,13 @@
 /processorParam:TextureFormat=Color
 /build:explosion_1.png
 
+#begin gameover_font.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:gameover_font.spritefont
+
 #begin highscore_wave.png
 /importer:TextureImporter
 /processor:TextureProcessor
