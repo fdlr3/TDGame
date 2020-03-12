@@ -25,17 +25,20 @@ namespace TDGame.Managers {
         public Dictionary<string, EnemyManager> EM { get; set; }
         public BulletManager BM { get; set; }
         private List<DamageDisplayer> _damage_positioins;
+        private SpriteFont _damage_font;
 
         //Constructor
         public BulletHitsEnemy(
             ref Dictionary<string, EnemyManager> enemies, 
             ref BulletManager bullet_manager,
-            ref Player player
+            ref Player player,
+            SpriteFont damange_font
             ) 
             {
             EM = enemies;
             BM = bullet_manager;
             P = player;
+            _damage_font = damange_font;
             _damage_positioins = new List<DamageDisplayer>();
         }
 
@@ -65,7 +68,7 @@ namespace TDGame.Managers {
             }
         }
 
-        public void Draw(SpriteBatch spriteBatch, SpriteFont font) {
+        public void Draw(SpriteBatch spriteBatch) {
             DamageDisplayer item = null;
             for(int i = 0; i < _damage_positioins.Count; i++) {
                 item = _damage_positioins[i];
@@ -73,7 +76,7 @@ namespace TDGame.Managers {
                     _damage_positioins.RemoveAt(i);
                     i--;
                 } else {
-                    spriteBatch.DrawString(font, $"- {item.Damage}", item.Position, Color.Red);
+                    spriteBatch.DrawString(_damage_font, $"- {item.Damage}", item.Position, Color.Red);
                     item.Counter--;
                 }
             }
