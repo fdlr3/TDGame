@@ -11,6 +11,13 @@ namespace TDGame {
     /// This is the main type for your game.
     /// </summary>
     public class Game1 : Game {
+
+        public enum CScreen { MainS, GameS };
+        public enum CGameState { MainScreen, Playing, Gameover, Quit };
+
+        public CScreen _screen = CScreen.MainS;
+        public CGameState _state = CGameState.MainScreen;
+
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
@@ -19,6 +26,12 @@ namespace TDGame {
 
         private int HEIGTH = 1080;
         private int WIDTH = 1920;
+
+        /****************************/
+        /********FONT SPRITES********/
+        /****************************/
+
+        private MainScreen _mainscreen;
 
         /****************************/
         /********FONT SPRITES********/
@@ -76,15 +89,41 @@ namespace TDGame {
         /// all of your content.
         /// </summary>
         protected override void LoadContent() {
-            // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+
             Rectangle win_size = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
             _damage_font = Content.Load<SpriteFont>("DamageFont");
 
             /********************************************************/
+            /********************INITIALIZE MAINSCREEN***************/
+            /********************************************************/
+            #region MainScreen LoadContent
+            _mainscreen = new MainScreen();
+            _mainscreen.AddButton(new Button
+                (
+                    Content.Load<Texture2D>("play"),
+                    new Vector2(610, 400),
+                    700, 200,
+                    CGameState.Playing
+                ));
+            _mainscreen.AddButton(new Button
+                (
+                    Content.Load<Texture2D>("exit"),
+                    new Vector2(610, 700),
+                    700, 200,
+                    CGameState.Quit
+                ));
+            _mainscreen.AddTexture
+                (
+                    Content.Load<Texture2D>("title"),
+                    new Vector2(460, 100)
+                );
+            #endregion
+
+            /********************************************************/
             /********************INITIALIZE HEALTHBAR****************/
             /********************************************************/
-
+            #region HealthBar LoadContent
             _hp50_root = new HealthBar(
                 Content.Load<Texture2D>("hp_50"),
                 50,
@@ -96,11 +135,12 @@ namespace TDGame {
                 250,
                 6
             );
+            #endregion
 
             /********************************************************/
             /*******************INITIALIZE BACKGROUND****************/
             /********************************************************/
-
+            #region BackgroundManager LoadContent
             _background_manager = new BackgroundManager
                 (
                     Content.Load<SpriteFont>("hs_wave"), 
@@ -128,11 +168,12 @@ namespace TDGame {
                    Content.Load<Texture2D>("right_energy_hp"),
                    new Vector2(WIDTH / 4 * 2, 0)
                );
+            #endregion
 
             /********************************************************/
             /********************INITIALIZE PORTALS******************/
             /********************************************************/
-
+            #region MainScreen PortalManager
             List<Vector2> portal_location = new List<Vector2>() {
                 new Vector2(700, 60),
                 new Vector2(1750, 300),
@@ -148,11 +189,12 @@ namespace TDGame {
 
             foreach (var a in portal_location)
                 _portal_manager.AddPortal(a);
+            #endregion
 
             /********************************************************/
             /*****************INITIALIZE ENERGY POINTS***************/
             /********************************************************/
-
+            #region EnergyStorageManager LoadContent
             _energy_storage_manager = new EnergyStorageManager(
                 Content.Load<Texture2D>("energy_point"),
                 214,
@@ -173,11 +215,12 @@ namespace TDGame {
                 new Vector2((WIDTH / 4 * 2) + 35, 40), 
                 2000
                 );
+            #endregion
 
             /********************************************************/
             /********************INITIALIZE ENEMIES******************/
             /********************************************************/
-
+            #region EnemyManager LoadContent
             _enemy_managers.Add("enemy1", new EnemyManager(
                 ref _portal_manager,
                 ref _energy_storage_manager, 
@@ -205,20 +248,22 @@ namespace TDGame {
                 Content.Load<Texture2D>("enemy_4"),
                 _hp50_root, 55, 100, 30, 300, 8, 5
             ));
+            #endregion
 
             /********************************************************/
             /********************INITIALIZE BULLETS******************/
             /********************************************************/
-
+            #region BulletManager LoadContent
             _bullet_manager = new BulletManager(
                 Content.Load<Texture2D>("okrogel_metek6"), 
                 win_size
             );
+            #endregion
 
             /********************************************************/
             /********************INITIALIZE PLAYER*******************/
             /********************************************************/
-
+            #region Player LoadContent
             _player = new Player(
                 Content.Load<Texture2D>("player"), 
                 win_size, 
@@ -227,22 +272,25 @@ namespace TDGame {
                 50, 
                 40
             );
+            #endregion
 
             /********************************************************/
             /***************INITIALIZE BULLET HITS ENEMY*************/
             /********************************************************/
-
+            #region BulletHitsEnemy LoadContent
             _bullet_hits_enemy = new BulletHitsEnemy(
                 ref _enemy_managers, 
                 ref _bullet_manager,
                 ref _player
             );
+            #endregion
 
             /********************************************************/
             /******************INITIALIZE WAVE MANAGER***************/
             /********************************************************/
-
+            #region WaveManager LoadContent
             _wave_manager = new WaveManager(ref _enemy_managers, 5000, 1000);
+            #endregion
 
         }
 
@@ -266,35 +314,58 @@ namespace TDGame {
             var ks = Keyboard.GetState();
             var ms = Mouse.GetState();
 
+            hack:
+            switch (_state) {
+                case CGameState.MainScreen:
+                    var ret = _mainscreen.Update(ms);
+                    if (ret.HasValue && (ret.Value == CGameState.Quit || ret.Value == CGameState.Playing)) {
+                        _state = ret.Value;
+                        goto hack;
+                    }
+                    break;
+                case CGameState.Playing:
+
+                    if (ms.LeftButton == ButtonState.Pressed && _fire_bullet_time > 180) {
+                        _bullet_manager.Add(_player.GetPosition(), _player.GetDirection());
+                        _fire_bullet_time = 0;
+                    }
+
+                    _player                 .Update(ks, ms);
+                    _background_manager     .Update(_wave_manager.WaveCount, _wave_manager.Highscore);
+                    _bullet_manager         .Update();
+                    _bullet_hits_enemy      .Update();
+                    _portal_manager         .Update();
+                    _energy_storage_manager .Update();
+                    _enemy_managers.Values
+                        .ToList()
+                        .ForEach(x => x     .Update(ref Highscore, gameTime));
+                    _wave_manager           .Update(gameTime, ref Highscore);
+
+                    break;
+                case CGameState.Gameover:
+                    break;
+                case CGameState.Quit:
+                    Exit();
+                    break;
+            }
+
             if (ks.IsKeyDown(Keys.Escape))
                 Exit();
 
             //fire bullet logic
-            if (ms.LeftButton == ButtonState.Pressed && _fire_bullet_time > 180) { 
-                _bullet_manager.Add(_player.GetPosition(), _player.GetDirection());
-                _fire_bullet_time = 0;
-            }
+            
 
             //GAME OVER
-            if(_energy_storage_manager._energy_storages.Count == 0) {
+            /*if(_energy_storage_manager._energy_storages.Count == 0) {
                 Exit();
-            }
+            }*/
 
 
             /***********************************/
             /***************UPDATES*************/
             /***********************************/
             
-            _player                 .Update(ks, ms);
-            _background_manager     .Update(_wave_manager.WaveCount, _wave_manager.Highscore);
-            _bullet_manager         .Update();
-            _bullet_hits_enemy      .Update();
-            _portal_manager         .Update();
-            _energy_storage_manager .Update();
-            _enemy_managers.Values
-                .ToList()
-                .ForEach(x => x     .Update(ref Highscore, gameTime));
-            _wave_manager           .Update(gameTime, ref Highscore);
+
 
             base.Update(gameTime);
         }
@@ -309,15 +380,29 @@ namespace TDGame {
 
             spriteBatch.Begin();
 
-            _background_manager     .Draw(spriteBatch);
-            _portal_manager         .Draw(spriteBatch);
-            _bullet_manager         .Draw(spriteBatch);
-            _enemy_managers.Values
-                .ToList()
-                .ForEach(x => x     .Draw(spriteBatch));
-            _player                 .Draw(spriteBatch);
-            _energy_storage_manager .Draw(spriteBatch);
-            _bullet_hits_enemy      .Draw(spriteBatch, _damage_font);
+            switch (_state) {
+                case CGameState.MainScreen:
+                    _mainscreen             .Draw(spriteBatch);
+                    break;
+                case CGameState.Playing:
+                    _background_manager     .Draw(spriteBatch);
+                    _portal_manager         .Draw(spriteBatch);
+                    _bullet_manager         .Draw(spriteBatch);
+                    _enemy_managers.Values
+                        .ToList()
+                        .ForEach(x => x     .Draw(spriteBatch));
+                    _player                 .Draw(spriteBatch);
+                    _energy_storage_manager .Draw(spriteBatch);
+                    _bullet_hits_enemy      .Draw(spriteBatch, _damage_font);
+                    break;
+                case CGameState.Gameover:
+                    break;
+                case CGameState.Quit:
+                    Exit();
+                    break;
+            }
+
+
             
             spriteBatch.End();
 
