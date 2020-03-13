@@ -26,20 +26,25 @@ namespace TDGame.Managers {
         public BulletManager BM { get; set; }
         private List<DamageDisplayer> _damage_positioins;
         private SpriteFont _damage_font;
+        private Texture2D _explosionroot;
+        private List<ExplosionAnimation> _ex_animations; 
 
         //Constructor
         public BulletHitsEnemy(
             ref Dictionary<string, EnemyManager> enemies, 
             ref BulletManager bullet_manager,
             ref Player player,
-            SpriteFont damange_font
+            SpriteFont damange_font,
+            Texture2D explosionroot
             ) 
             {
             EM = enemies;
             BM = bullet_manager;
             P = player;
+            _explosionroot = explosionroot;
             _damage_font = damange_font;
             _damage_positioins = new List<DamageDisplayer>();
+            _ex_animations = new List<ExplosionAnimation>();
         }
 
         public void Update() {
@@ -53,8 +58,8 @@ namespace TDGame.Managers {
                         if (rect.Contains(b._position)) {
                             e.Damage(P._strength);
                             b._isvalid = false;
-                            Vector2 loc_vec = new Vector2(b._position.X, b._position.Y);
-
+                            Vector2 loc_vec = new Vector2(b._position.X - 20, b._position.Y - 20);
+                            _ex_animations.Add(new ExplosionAnimation(_explosionroot, 20, 20, b._position, 4));
                             //reposition text if they overlap
                             if (_damage_positioins.FirstOrDefault(x => x.Position == loc_vec) != null) {
                                 loc_vec.X -= 5.0f;
@@ -66,10 +71,20 @@ namespace TDGame.Managers {
                     }
                 }
             }
+            foreach (var ex in _ex_animations)
+                ex.Update();
         }
 
         public void Draw(SpriteBatch spriteBatch) {
             DamageDisplayer item = null;
+            for(int i = 0; i < _ex_animations.Count; i++) {
+                if (!_ex_animations[i]._isvalid) {
+                    _ex_animations.RemoveAt(i);
+                    i--;
+                } else {
+                    _ex_animations[i].Draw(spriteBatch);
+                }
+            }
             for(int i = 0; i < _damage_positioins.Count; i++) {
                 item = _damage_positioins[i];
                 if(item.Counter == 0) {

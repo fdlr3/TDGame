@@ -7,8 +7,8 @@ using System.Text;
 namespace TDGame.Managers {
     public class EnergyStorage : SpriteObject {
         private Tuple<HealthBar, HealthBar> _healthbar;
-        private int _max_health;
-        private int _health;
+        public int _max_health;
+        public int _health;
         public int _counter;
         public int _pause;
 

@@ -20,7 +20,10 @@ namespace TDGame.Managers {
             _window_size = win_size;
             _direction = new Vector2(0, 0);
             _strength = strength;
-        }      
+        }
+
+        public void IncStrength(int dmg) => _strength += dmg;
+
         public Vector2 GetPosition() {
             return _position;
         }

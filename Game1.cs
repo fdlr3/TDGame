@@ -46,6 +46,7 @@ namespace TDGame {
         private PortalManager                       _portal_manager;
         private WaveManager                         _wave_manager;
         private BackgroundManager                   _background_manager;
+        private PowerupManager                      _powerup_manager;
 
         /****************************/
         /***********TIMERS***********/
@@ -110,15 +111,16 @@ namespace TDGame {
         public void LoadGame() 
         {
             _enemy_managers.Clear();
-            _hp50_root = null;
-            _hp250_root = null;
-            _bullet_manager = null;
-            _player = null;
-            _bullet_hits_enemy = null;
+            _hp50_root              = null;
+            _hp250_root             = null;
+            _bullet_manager         = null;
+            _player                 = null;
+            _bullet_hits_enemy      = null;
             _energy_storage_manager = null;
-            _portal_manager = null;
-            _wave_manager = null;
-            _background_manager = null;
+            _portal_manager         = null;
+            _wave_manager           = null;
+            _background_manager     = null;
+            _powerup_manager        = null;
 
             #region HealthBar LoadContent
             _hp50_root = new HealthBar(
@@ -258,12 +260,41 @@ namespace TDGame {
                 ref _enemy_managers,
                 ref _bullet_manager,
                 ref _player, 
-                _fstorage["DamageFont"]
+                _fstorage["DamageFont"],
+                _tstorage["mini_explosion"]
             );
             #endregion
 
             #region WaveManager LoadContent
             _wave_manager = new WaveManager(ref _enemy_managers, 5000, 1000);
+            #endregion
+
+            #region PowerupManager LoadContent
+            List<Rectangle> spawn_locs = new List<Rectangle>()
+            {
+                new Rectangle(100, 100, 250, 150),
+                new Rectangle(100, 600, 800, 200),
+                new Rectangle(900, 200, 600, 250),
+                new Rectangle(1300, 700, 400, 200)
+            };
+
+            _powerup_manager = new PowerupManager(10000, spawn_locs);
+            _powerup_manager.AddPowerup
+                (
+                _tstorage["damage_pu"],
+                34,
+                50,
+                10,
+                PowerupManager.PowerUpType.PUT_PWR
+                );
+            _powerup_manager.AddPowerup
+                (
+                _tstorage["health_pu"],
+                35,
+                50,
+                8,
+                PowerupManager.PowerUpType.PUT_HP
+                );
             #endregion
 
             _state = CGameState.Playing;
@@ -297,7 +328,7 @@ namespace TDGame {
 
             _tstorage = new Dictionary<string, Texture2D>() 
             {
-                { "enemy_1",              Content.Load<Texture2D>("enemy_1") },
+                { "enemy_1",            Content.Load<Texture2D>("enemy_1") },
                 { "enemy_2",            Content.Load<Texture2D>("enemy_2") },
                 { "enemy_3",            Content.Load<Texture2D>("enemy_3") },
                 { "enemy_4",            Content.Load<Texture2D>("enemy_4") },
@@ -315,7 +346,9 @@ namespace TDGame {
                 { "player",             Content.Load<Texture2D>("player") },
                 { "portal_vecji",       Content.Load<Texture2D>("portal_vecji") },
                 { "right_energy_hp",    Content.Load<Texture2D>("right_energy_hp") },
-                { "title",              Content.Load<Texture2D>("title") }
+                { "title",              Content.Load<Texture2D>("title") },
+                { "damage_pu",          Content.Load<Texture2D>("damage_pu") },
+                { "health_pu",          Content.Load<Texture2D>("health_pu") }
             };
 
             _fstorage = new Dictionary<string, SpriteFont>() 
@@ -372,6 +405,7 @@ namespace TDGame {
                     _bullet_hits_enemy      .Update();
                     _portal_manager         .Update();
                     _energy_storage_manager .Update();
+                    _powerup_manager        .Update(gameTime, ref _player, ref _energy_storage_manager);
                     _enemy_managers.Values
                         .ToList()
                         .ForEach(x => x     .Update(ref Highscore, gameTime));
@@ -385,7 +419,7 @@ namespace TDGame {
                     break;
                 case CGameState.Gameover:
                     if (_gameoverscreen == null)
-                        LoadGameOver(Highscore);
+                        LoadGameOver(_wave_manager.Highscore);
                     ret = _gameoverscreen.Update(ms);
                     if (ret.HasValue && ret.Value == CGameState.StartGame) {
                         _state = ret.Value;
@@ -427,8 +461,9 @@ namespace TDGame {
                     _player                 .Draw(spriteBatch);
                     _energy_storage_manager .Draw(spriteBatch);
                     _bullet_hits_enemy      .Draw(spriteBatch);
+                    _powerup_manager        .Draw(spriteBatch);
 
-                    if(_state == CGameState.Gameover)
+                    if (_state == CGameState.Gameover)
                         _gameoverscreen.Draw(spriteBatch);
                     break;
             }
