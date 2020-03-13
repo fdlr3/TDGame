@@ -53,8 +53,6 @@ namespace TDGame {
         /****************************/
         private double _fire_bullet_time = 0;
 
-        
-
         public Game1() {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -65,6 +63,7 @@ namespace TDGame {
 
         public void LoadMainScreen() {
             _mainscreen = null;
+            _gameoverscreen = null;
 
             _mainscreen = new MainScreen();
 
@@ -151,6 +150,7 @@ namespace TDGame {
         public void LoadGame() 
         {
             _enemy_managers.Clear();
+            _gameoverscreen         = null;
             _hp50_root              = null;
             _hp250_root             = null;
             _bullet_manager         = null;
@@ -457,7 +457,6 @@ namespace TDGame {
                         .ToList()
                         .ForEach(x => x     .Update(ref Highscore, gameTime));
                     _wave_manager           .Update(gameTime, ref Highscore);
-
                     //game over 
                     if (_energy_storage_manager._energy_storages.Count == 0) {
                         _state = CGameState.Gameover;
@@ -471,9 +470,7 @@ namespace TDGame {
                     if (ret.HasValue && ret.Value == CGameState.StartGame) {
                         _state = ret.Value;
                         goto hack;
-                    }
-                    else if (ret.HasValue && ret.Value == CGameState.Quit)
-                    {
+                    } else if (ret.HasValue && ret.Value == CGameState.Quit) {
                         _state = ret.Value;
                         goto hack;
                     }

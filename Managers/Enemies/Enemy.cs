@@ -12,6 +12,7 @@ namespace TDGame.Managers {
         public EnergyStorage _ES;
         private Tuple<HealthBar, HealthBar> _healthbar;
         public bool _arrived;
+        public bool _killed;
         public int _max_health;
         public int _health;
         public int _strength;
@@ -31,6 +32,7 @@ namespace TDGame.Managers {
             _strength = strength;
             _velocity = velocity;
             _animation_count = animation_count;
+            _killed = false;
         }
 
         public void Init
@@ -51,7 +53,7 @@ namespace TDGame.Managers {
             _pause = 0;
             _damage_counter = 0;
             _angle = angle;
-
+            _killed = false;
             _healthbar = new Tuple<HealthBar, HealthBar>
                 (
                     roothp.Clone() as HealthBar,
@@ -67,8 +69,11 @@ namespace TDGame.Managers {
 
         public void Damage(int dmg) {
             this._health -= dmg;
-            if (_health <= 0)
+            if (_health <= 0) {
+                _killed = true;
                 _isvalid = false;
+            }
+                
         }
 
         public void Update(GameTime gameTime) {
