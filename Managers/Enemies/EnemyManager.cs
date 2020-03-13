@@ -106,6 +106,15 @@ namespace TDGame.Managers {
             Enemies.Add(x);
         }
 
+        //val has to be between 0.0 and 1.0f
+        public void IncreaseStrength(float val) {
+            if(val >= 0.0f && val <= 1.0f) {
+                _rootEnemy._max_health  +=  (int)(_rootEnemy._max_health * val);
+                _rootEnemy._health      +=  (int)(_rootEnemy._health * val);
+                _rootEnemy._strength    +=  (int)(_rootEnemy._strength * val);
+                _rootEnemy._velocity    *=  (1.0f + val);
+            }
+        }
 
         public void Update(ref int Highscore, GameTime gameTime) {
             for (int i = 0; i < Enemies.Count; i++) {

@@ -41,6 +41,9 @@ namespace TDGame.Managers {
                     TimeoutCounter = 0;
                     GenerateEnemyQueue();
                     WaveCount++;
+                    foreach(var a in _EM.Values) {
+                        a.IncreaseStrength(0.025f);
+                    }
                     if(SpawnOffset > 1000)
                         SpawnOffset -= 100;
                 }

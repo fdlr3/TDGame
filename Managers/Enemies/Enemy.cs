@@ -17,14 +17,14 @@ namespace TDGame.Managers {
         public int _health;
         public int _strength;
         public double _damage_counter;
-        public int _velocity;
+        public float _velocity;
         public int _counter;
         public int _pause;
         public int _animation_count;
         public float _angle = .0f;
   
 
-        public Enemy(Texture2D texture, int w, int h, int health, int strength, int velocity, int animation_count)
+        public Enemy(Texture2D texture, int w, int h, int health, int strength, float velocity, int animation_count)
             : base(texture, w, h) {
             _arrived = false;
             _health = health;
