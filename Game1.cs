@@ -67,24 +67,38 @@ namespace TDGame {
             _mainscreen = null;
 
             _mainscreen = new MainScreen();
+
+            _mainscreen.AddTexture
+               (
+                   _tstorage["map"],
+                   new Vector2(0, 0)
+               );
+
             _mainscreen.AddButton(new Button
                 (
-                    _tstorage["play"],
-                    new Vector2(610, 400),
-                    700, 200,
+                    _tstorage["playpng"],
+                    new Vector2(755, 500),
+                    400, 110,
                     CGameState.StartGame
                 ));
+
             _mainscreen.AddButton(new Button
                 (
-                    _tstorage["exit"],
-                    new Vector2(610, 700),
-                    700, 200,
+                    _tstorage["exitpng"],
+                    new Vector2(755, 650),
+                    400, 110,
                     CGameState.Quit
                 ));
             _mainscreen.AddTexture
                 (
                     _tstorage["title"],
-                    new Vector2(460, 100)
+                    new Vector2(460, 200)
+                );
+            _mainscreen.AddText
+                (
+                    _fstorage["font"],
+                    new Vector2(790, 950),
+                    "Avtorji: Duler, Hober, Kolar"
                 );
         }
 
@@ -92,18 +106,44 @@ namespace TDGame {
             _gameoverscreen = null;
 
             _gameoverscreen = new GameOverScreen();
+           _gameoverscreen.AddTexture
+                (
+                    _tstorage["map"],
+                    new Vector2(0, 0)
+                ); 
+
             _gameoverscreen.AddButton(new Button
                 (
-                    _tstorage["play"],
-                    new Vector2(610, 400),
-                    700, 200,
+                    _tstorage["exit2"],
+                    new Vector2(1020, 698),
+                    400, 110,
+                    CGameState.Quit
+                ));
+
+            _gameoverscreen.AddButton(new Button
+                (
+                    _tstorage["tryagain"],
+                    new Vector2(500, 700),
+                    400, 110,
                     CGameState.StartGame
                 ));
+
+            _gameoverscreen.AddTexture
+               (
+                   _tstorage["highscore"],
+                   new Vector2(555, 500)
+               );
+
+            _gameoverscreen.AddTexture
+               (
+                   _tstorage["gameover"],
+                   new Vector2(560, 200)
+               );
 
             _gameoverscreen.AddText
                 (
                     _fstorage["gameover_font"],
-                    new Vector2(460, 100),
+                    new Vector2(990, 513),
                     highscore.ToString()
                 );
         }
@@ -348,14 +388,21 @@ namespace TDGame {
                 { "right_energy_hp",    Content.Load<Texture2D>("right_energy_hp") },
                 { "title",              Content.Load<Texture2D>("title") },
                 { "damage_pu",          Content.Load<Texture2D>("damage_pu") },
-                { "health_pu",          Content.Load<Texture2D>("health_pu") }
+                { "health_pu",          Content.Load<Texture2D>("health_pu") },
+                { "playpng",            Content.Load<Texture2D>("playpng") },
+                { "exitpng",            Content.Load<Texture2D>("exitpng") },
+                { "exit2",              Content.Load<Texture2D>("exit2") },
+                { "tryagain",           Content.Load<Texture2D>("tryagain") },
+                { "highscore",          Content.Load<Texture2D>("highscore") },
+                { "gameover",           Content.Load<Texture2D>("gameover") },
             };
 
             _fstorage = new Dictionary<string, SpriteFont>() 
             {
                 { "DamageFont",     Content.Load<SpriteFont>("DamageFont") },
                 { "hs_wave",        Content.Load<SpriteFont>("hs_wave") },
-                { "gameover_font",  Content.Load<SpriteFont>("gameover_font") }
+                { "gameover_font",  Content.Load<SpriteFont>("gameover_font") },
+                { "font",           Content.Load<SpriteFont>("font") }
             };
 
             LoadMainScreen();
@@ -422,6 +469,11 @@ namespace TDGame {
                         LoadGameOver(_wave_manager.Highscore);
                     ret = _gameoverscreen.Update(ms);
                     if (ret.HasValue && ret.Value == CGameState.StartGame) {
+                        _state = ret.Value;
+                        goto hack;
+                    }
+                    else if (ret.HasValue && ret.Value == CGameState.Quit)
+                    {
                         _state = ret.Value;
                         goto hack;
                     }
