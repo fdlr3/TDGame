@@ -53,7 +53,7 @@ namespace TDGame.Managers {
 
             for (int i = 0; i < _EM._energy_storages.Count; i++) {
                 var es = _EM._energy_storages[i];
-                Rectangle es_center = new Rectangle((int)es._position.X, (int)es._position.Y, es._width, es._heigth);
+                Rectangle es_center = new Rectangle((int)es._position.X, (int)es._position.Y, es._width, es._height);
                 float cur_dist = Vector2.Distance(_PM._portals[sel_spawn]._position, es_center.Center.ToVector2());
 
                 if(cur_dist < dist) {
@@ -68,7 +68,7 @@ namespace TDGame.Managers {
                 (int)selected_portal._position.X,
                 (int)selected_portal._position.Y,
                 selected_portal._width,
-                selected_portal._heigth
+                selected_portal._height
             ).Center.ToVector2();
 
             var final_loc = _EM._energy_storages[j];
@@ -78,11 +78,11 @@ namespace TDGame.Managers {
                 (int)final_loc._position.X,
                 (int)final_loc._position.Y,
                 final_loc._width,
-                final_loc._heigth
+                final_loc._height
             );
             final_position.Inflate(
                 (int)-(final_loc._width * 0.25f), 
-                (int)-(final_loc._heigth * 0.25f)
+                (int)-(final_loc._height * 0.25f)
             );
 
             //get random point in final location
@@ -93,12 +93,12 @@ namespace TDGame.Managers {
 
             final_position.Inflate(
                 (int)(final_loc._width * 0.25f),
-                (int)(final_loc._heigth * 0.25f)
+                (int)(final_loc._height * 0.25f)
             );
 
             //calculate angle
             float monster_angle = .0f;
-            var _pos_center = new Rectangle((int)center_spawn.X, (int)center_spawn.Y, _rootEnemy._width, _rootEnemy._heigth);
+            var _pos_center = new Rectangle((int)center_spawn.X, (int)center_spawn.Y, _rootEnemy._width, _rootEnemy._height);
             var cam_v = final_loc._position - _pos_center.Center.ToVector2();
             monster_angle = (float)Math.Atan2(cam_v.Y, cam_v.X);
 

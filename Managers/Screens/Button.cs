@@ -32,7 +32,7 @@ namespace TDGame.Managers {
                         (int)_position.X,
                         (int)_position.Y,
                         _width,
-                        _heigth
+                        _height
                     ).Contains(new Vector2(ms.X, ms.Y))
                 ) {
                 _ishovering = true;

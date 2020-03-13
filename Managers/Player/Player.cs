@@ -32,7 +32,7 @@ namespace TDGame.Managers {
         }
         public void Update(KeyboardState ks, MouseState ms) {
             var n_v = _position;
-            var _pos_center = new Rectangle((int)_position.X + 10, (int)_position.Y + 10, _width, _heigth);
+            var _pos_center = new Rectangle((int)_position.X + 10, (int)_position.Y + 10, _width, _height);
             var cam_v = new Vector2(ms.X, ms.Y) - _pos_center.Center.ToVector2();
             _angle = (float)Math.Atan2(cam_v.Y, cam_v.X);
 
@@ -58,11 +58,11 @@ namespace TDGame.Managers {
         public void Draw(SpriteBatch spriteBatch) {
             spriteBatch.Draw(
                 _texture,
-                new Rectangle((int)_position.X, (int)_position.Y, _width, _heigth),
+                new Rectangle((int)_position.X, (int)_position.Y, _width, _height),
                 null,
                 Color.White,
                 (float)(_angle),
-                new Vector2(_width / 2, _heigth / 2),
+                new Vector2(_width / 2, _height / 2),
                 SpriteEffects.None,
                 .75f
             );

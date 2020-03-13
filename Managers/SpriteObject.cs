@@ -9,13 +9,13 @@ namespace TDGame.Managers {
         protected Texture2D _texture;
         public Vector2 _position;
         public int _width;
-        public int _heigth;
+        public int _height;
         public bool _isvalid;
 
         public SpriteObject(Texture2D texture, int w, int h){
             _texture = texture;
             _width = w;
-            _heigth = h;
+            _height = h;
             _isvalid = false;
         }
 

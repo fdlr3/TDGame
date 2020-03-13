@@ -98,7 +98,7 @@ namespace TDGame.Managers {
                 _counter++;
                 _pause = 0;
             }
-            Vector2 hp_pos = new Vector2(_position.X - (_width / 2), (_position.Y - _heigth / 2));
+            Vector2 hp_pos = new Vector2(_position.X - (_width / 2), (_position.Y - _height / 2));
             _healthbar.Item1.Update(hp_pos);
             _healthbar.Item2.Update(hp_pos);
             _healthbar.Item1.ReduceLenght((float)_health / (float)_max_health);
@@ -114,15 +114,15 @@ namespace TDGame.Managers {
                     (int)_position.X,
                     (int)_position.Y,
                     _width,
-                    _heigth),
+                    _height),
                 new Rectangle(
                     _counter * _width,
                     0,
                     _width,
-                    _heigth),
+                    _height),
                 Color.White,
                 _angle - (float) (Math.PI * 0.5f), 
-                new Vector2(_width / 2, _heigth /2), 
+                new Vector2(_width / 2, _height /2), 
                 SpriteEffects.None, 
                 0.25f
             );

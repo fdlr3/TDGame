@@ -60,12 +60,12 @@ namespace TDGame.Managers {
                     (int)_position.X, //952
                     (int)_position.Y, //81
                     _width,
-                    _heigth),
+                    _height),
                 new Rectangle(
                     _counter * _width,
                     0,
                     _width,
-                    _heigth),
+                    _height),
                 Color.White,
                 0.0f,
                 new Vector2(1,1),

@@ -51,7 +51,7 @@ namespace TDGame.Managers {
                         (int)pu._position.X,
                         (int)pu._position.Y,
                         pu._width,
-                        pu._heigth
+                        pu._height
                         );
                     if (r.Contains(player._position)) {
                         pu._isvalid = false;

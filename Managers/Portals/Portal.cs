@@ -36,7 +36,7 @@ namespace TDGame.Managers {
                  new Rectangle(_counter * _width,
                                0,
                                _width,
-                               _heigth),
+                               _height),
                  Color.White);
         }
     }

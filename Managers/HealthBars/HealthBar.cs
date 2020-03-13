@@ -30,13 +30,13 @@ namespace TDGame.Managers {
                     (int)_position.X,
                     (int)_position.Y,
                     (int)(_width * _red_length),
-                    _heigth
+                    _height
                 ),
                 new Rectangle
                 (
                     0, 0,
                     (int)(_width * _red_length),
-                    _heigth
+                    _height
                 ),
                 _color,
                 .0f,
