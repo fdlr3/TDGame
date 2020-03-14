@@ -69,7 +69,7 @@ namespace TDGame {
 
             _mainscreen.AddTexture
                (
-                   _tstorage["map"],
+                   _tstorage["naslov"],
                    new Vector2(0, 0)
                );
 
@@ -88,11 +88,11 @@ namespace TDGame {
                     400, 110,
                     CGameState.Quit
                 ));
-            _mainscreen.AddTexture
-                (
-                    _tstorage["title"],
-                    new Vector2(460, 200)
-                );
+            //_mainscreen.AddTexture
+            //    (
+            //        _tstorage["title"],
+            //        new Vector2(460, 200)
+            //    );
             _mainscreen.AddText
                 (
                     _fstorage["font"],
@@ -395,6 +395,7 @@ namespace TDGame {
                 { "tryagain",           Content.Load<Texture2D>("tryagain") },
                 { "highscore",          Content.Load<Texture2D>("highscore") },
                 { "gameover",           Content.Load<Texture2D>("gameover") },
+                { "naslov",             Content.Load<Texture2D>("naslov") }
             };
 
             _fstorage = new Dictionary<string, SpriteFont>() 
