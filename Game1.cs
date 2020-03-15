@@ -134,12 +134,7 @@ namespace TDGame
             _gameoverscreen = null;
 
             _mainscreen = new MainScreen();
-
-            _mainscreen.AddTexture
-               (
-                   _tstorage["naslov"],
-                   new Vector2(0, 0)
-               );
+            _mainscreen.AddTitle(_tstorage["background_intro"], new Vector2(450, 100), 2, 1024, 600);
 
             _mainscreen.AddButton(new Button
                 (
@@ -164,17 +159,7 @@ namespace TDGame
                     400, 110,
                     CGameState.CreditsScreen
                 ));
-            //_mainscreen.AddTexture
-            //    (
-            //        _tstorage["title"],
-            //        new Vector2(460, 200)
-            //    );
-            //_mainscreen.AddText
-            //    (
-            //        _fstorage["font"],
-            //        new Vector2(790, 950),
-            //        "Avtorji: Duler, Hober, Kolar"
-            //    );
+
         }
 
         public void LoadGameOver(int highscore)
@@ -430,6 +415,7 @@ namespace TDGame
             graphics.PreferredBackBufferWidth = WIDTH;
             graphics.PreferredBackBufferHeight = HEIGTH;
             graphics.IsFullScreen = false;
+            graphics.ToggleFullScreen();
             graphics.ApplyChanges();
 
             win_size = new Rectangle(0, 0, WIDTH, HEIGTH);
@@ -477,7 +463,8 @@ namespace TDGame
                 { "gameover",           Content.Load<Texture2D>("gameover") },
                 { "naslov",             Content.Load<Texture2D>("naslov") },
                 { "credits",            Content.Load<Texture2D>("credits") },
-                { "ozadje",             Content.Load<Texture2D>("ozadje") }
+                { "ozadje",             Content.Load<Texture2D>("ozadje") },
+                { "background_intro",   Content.Load<Texture2D>("background_intro") }
             };
 
             _fstorage = new Dictionary<string, SpriteFont>()
@@ -552,17 +539,17 @@ namespace TDGame
                         _fire_bullet_time = 0;
                     }
 
-                    _player.Update(ks, ms);
-                    _background_manager.Update(_wave_manager.WaveCount, _wave_manager.Highscore);
-                    _bullet_manager.Update();
-                    _bullet_hits_enemy.Update();
-                    _portal_manager.Update();
-                    _energy_storage_manager.Update();
-                    _powerup_manager.Update(gameTime, ref _player, ref _energy_storage_manager);
+                    _player                 .Update(ks, ms);
+                    _background_manager     .Update(_wave_manager.WaveCount, _wave_manager.Highscore);
+                    _bullet_manager         .Update();
+                    _bullet_hits_enemy      .Update();
+                    _portal_manager         .Update();
+                    _energy_storage_manager .Update();
+                    _powerup_manager        .Update(gameTime, ref _player, ref _energy_storage_manager);
                     _enemy_managers.Values
                         .ToList()
-                        .ForEach(x => x.Update(ref Highscore, gameTime));
-                    _wave_manager.Update(gameTime, ref Highscore);
+                        .ForEach(x => x     .Update(ref Highscore, gameTime));
+                    _wave_manager           .Update(gameTime, ref Highscore);
                     //game over 
                     if (_energy_storage_manager._energy_storages.Count == 0)
                     {
@@ -604,36 +591,36 @@ namespace TDGame
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.DimGray);
+            GraphicsDevice.Clear(new Color(31, 31, 31));
 
             spriteBatch.Begin();
 
             switch (_state)
             {
                 case CGameState.MainScreen:
-                    _mainscreen.Draw(spriteBatch);
+                    _mainscreen             .Draw(spriteBatch);
                     break;
 
                 case CGameState.CreditsScreen:
-                    _creditsScreen.Draw(spriteBatch);
+                    _creditsScreen          .Draw(spriteBatch);
                     break;
 
                 case CGameState.Playing:
-                _background_manager.Draw(spriteBatch);
-                    _portal_manager.Draw(spriteBatch);
-                    _bullet_manager.Draw(spriteBatch);
+                _background_manager         .Draw(spriteBatch);
+                    _portal_manager         .Draw(spriteBatch);
+                    _bullet_manager         .Draw(spriteBatch);
                     _enemy_managers.Values
                         .ToList()
-                        .ForEach(x => x.Draw(spriteBatch));
-                    _player.Draw(spriteBatch);
-                    _energy_storage_manager.Draw(spriteBatch);
-                    _bullet_hits_enemy.Draw(spriteBatch);
-                    _powerup_manager.Draw(spriteBatch);
+                        .ForEach(x => x     .Draw(spriteBatch));
+                    _player                 .Draw(spriteBatch);
+                    _energy_storage_manager .Draw(spriteBatch);
+                    _bullet_hits_enemy      .Draw(spriteBatch);
+                    _powerup_manager        .Draw(spriteBatch);
 
                     break;
 
                 case CGameState.Gameover:
-                    _gameoverscreen.Draw(spriteBatch);
+                    _gameoverscreen         .Draw(spriteBatch);
                     break;
             }
 
