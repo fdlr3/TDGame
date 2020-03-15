@@ -6,12 +6,14 @@ using System.Diagnostics;
 using System.Linq;
 using TDGame.Managers;
 
-namespace TDGame {
+namespace TDGame
+{
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
-    public class Game1 : Game {
-        public enum CGameState { MainScreen, StartGame, Playing, Gameover, Quit };
+    public class Game1 : Game
+    {
+        public enum CGameState { MainScreen, StartGame, Playing, Gameover, Quit, CreditsScreen };
 
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
@@ -21,39 +23,41 @@ namespace TDGame {
         /****************************/
         /***********WINDOW***********/
         /****************************/
-        private int HEIGTH  = 1080;
-        private int WIDTH   = 1920;
+        private int HEIGTH = 1080;
+        private int WIDTH = 1920;
         private Rectangle win_size;
 
         /****************************/
         /*******TEXTURE STORAGE******/
         /****************************/
-        private Dictionary<string, Texture2D>   _tstorage;
-        private Dictionary<string, SpriteFont>  _fstorage;
+        private Dictionary<string, Texture2D> _tstorage;
+        private Dictionary<string, SpriteFont> _fstorage;
 
         /****************************/
         /**********MANAGERS**********/
         /****************************/
-        private GameOverScreen                      _gameoverscreen;
-        private MainScreen                          _mainscreen;
-        private HealthBar                           _hp50_root;
-        private HealthBar                           _hp250_root;
-        private Dictionary<string, EnemyManager>    _enemy_managers;
-        private BulletManager                       _bullet_manager;
-        private Player                              _player;
-        private BulletHitsEnemy                     _bullet_hits_enemy;
-        private EnergyStorageManager                _energy_storage_manager;
-        private PortalManager                       _portal_manager;
-        private WaveManager                         _wave_manager;
-        private BackgroundManager                   _background_manager;
-        private PowerupManager                      _powerup_manager;
+        private GameOverScreen _gameoverscreen;
+        private MainScreen _mainscreen;
+        private HealthBar _hp50_root;
+        private HealthBar _hp250_root;
+        private Dictionary<string, EnemyManager> _enemy_managers;
+        private BulletManager _bullet_manager;
+        private Player _player;
+        private BulletHitsEnemy _bullet_hits_enemy;
+        private EnergyStorageManager _energy_storage_manager;
+        private PortalManager _portal_manager;
+        private WaveManager _wave_manager;
+        private BackgroundManager _background_manager;
+        private PowerupManager _powerup_manager;
+        private CreditsScreen _creditsScreen;
 
         /****************************/
         /***********TIMERS***********/
         /****************************/
         private double _fire_bullet_time = 0;
 
-        public Game1() {
+        public Game1()
+        {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsFixedTimeStep = true;
@@ -61,7 +65,71 @@ namespace TDGame {
             IsMouseVisible = true;
         }
 
-        public void LoadMainScreen() {
+        public void LoadCreditsScreen()
+        {
+            _creditsScreen = null;
+
+            _creditsScreen = new CreditsScreen();
+
+            _creditsScreen.AddTexture
+               (
+                   _tstorage["ozadje"],
+                   new Vector2(0, 0)
+               );
+
+            _creditsScreen.AddText
+                (
+                    _fstorage["RetroFont"],
+                    new Vector2(670, 100),
+                    "CREDITS"
+                );
+
+            _creditsScreen.AddText
+                (
+                    _fstorage["font"],
+                    new Vector2(795, 300),
+                    "Masa Hober - Design"
+                );
+
+            _creditsScreen.AddText
+                (
+                    _fstorage["font"],
+                    new Vector2(720, 350),
+                    "Filip Duler - Lead Programmer"
+                );
+
+            _creditsScreen.AddText
+                (
+                    _fstorage["font"],
+                    new Vector2(840, 400),
+                    "Teja Kolar - UI"
+                );
+
+            _creditsScreen.AddText
+                (
+                    _fstorage["font"],
+                    new Vector2(920, 600),
+                    "FERI"
+                );
+
+            _creditsScreen.AddText
+                (
+                    _fstorage["font"],
+                    new Vector2(795, 700),
+                    "Maribor, marec 2020"
+                );
+
+            _creditsScreen.AddButton(new Button
+                (
+                    _tstorage["exitpng"],
+                    new Vector2(760, 800),
+                    400, 110,
+                    CGameState.MainScreen
+                ));
+        }
+
+        public void LoadMainScreen()
+        {
             _mainscreen = null;
             _gameoverscreen = null;
 
@@ -76,7 +144,7 @@ namespace TDGame {
             _mainscreen.AddButton(new Button
                 (
                     _tstorage["playpng"],
-                    new Vector2(755, 500),
+                    new Vector2(760, 500),
                     400, 110,
                     CGameState.StartGame
                 ));
@@ -84,37 +152,47 @@ namespace TDGame {
             _mainscreen.AddButton(new Button
                 (
                     _tstorage["exitpng"],
-                    new Vector2(755, 650),
+                    new Vector2(760, 650),
                     400, 110,
                     CGameState.Quit
+                ));
+
+            _mainscreen.AddButton(new Button
+                (
+                    _tstorage["credits"],
+                    new Vector2(760, 800),
+                    400, 110,
+                    CGameState.CreditsScreen
                 ));
             //_mainscreen.AddTexture
             //    (
             //        _tstorage["title"],
             //        new Vector2(460, 200)
             //    );
-            _mainscreen.AddText
-                (
-                    _fstorage["font"],
-                    new Vector2(790, 950),
-                    "Avtorji: Duler, Hober, Kolar"
-                );
+            //_mainscreen.AddText
+            //    (
+            //        _fstorage["font"],
+            //        new Vector2(790, 950),
+            //        "Avtorji: Duler, Hober, Kolar"
+            //    );
         }
 
-        public void LoadGameOver(int highscore) {
+        public void LoadGameOver(int highscore)
+        {
             _gameoverscreen = null;
 
             _gameoverscreen = new GameOverScreen();
-           _gameoverscreen.AddTexture
-                (
-                    _tstorage["map"],
-                    new Vector2(0, 0)
-                ); 
+
+            _gameoverscreen.AddTexture
+                 (
+                     _tstorage["map"],
+                     new Vector2(0, 0)
+                 );
 
             _gameoverscreen.AddButton(new Button
                 (
                     _tstorage["exit2"],
-                    new Vector2(1020, 698),
+                    new Vector2(1020, 700),
                     400, 110,
                     CGameState.Quit
                 ));
@@ -122,7 +200,7 @@ namespace TDGame {
             _gameoverscreen.AddButton(new Button
                 (
                     _tstorage["tryagain"],
-                    new Vector2(500, 700),
+                    new Vector2(500, 698),
                     400, 110,
                     CGameState.StartGame
                 ));
@@ -142,25 +220,25 @@ namespace TDGame {
             _gameoverscreen.AddText
                 (
                     _fstorage["gameover_font"],
-                    new Vector2(990, 513),
+                    new Vector2(990, 510),
                     highscore.ToString()
                 );
         }
 
-        public void LoadGame() 
+        public void LoadGame()
         {
             _enemy_managers.Clear();
-            _gameoverscreen         = null;
-            _hp50_root              = null;
-            _hp250_root             = null;
-            _bullet_manager         = null;
-            _player                 = null;
-            _bullet_hits_enemy      = null;
+            _gameoverscreen = null;
+            _hp50_root = null;
+            _hp250_root = null;
+            _bullet_manager = null;
+            _player = null;
+            _bullet_hits_enemy = null;
             _energy_storage_manager = null;
-            _portal_manager         = null;
-            _wave_manager           = null;
-            _background_manager     = null;
-            _powerup_manager        = null;
+            _portal_manager = null;
+            _wave_manager = null;
+            _background_manager = null;
+            _powerup_manager = null;
 
             #region HealthBar LoadContent
             _hp50_root = new HealthBar(
@@ -180,8 +258,8 @@ namespace TDGame {
             _background_manager = new BackgroundManager
                 (
                     _fstorage["hs_wave"],
-                    new Vector2(1680, 75),
-                    new Vector2(1770, 28)
+                    new Vector2(1680, 72),
+                    new Vector2(1770, 23)
                 );
 
             _background_manager.AddTexture
@@ -299,7 +377,7 @@ namespace TDGame {
             _bullet_hits_enemy = new BulletHitsEnemy(
                 ref _enemy_managers,
                 ref _bullet_manager,
-                ref _player, 
+                ref _player,
                 _fstorage["DamageFont"],
                 _tstorage["mini_explosion"]
             );
@@ -346,7 +424,8 @@ namespace TDGame {
         /// related content.  Calling base.Initialize will enumerate through any components
         /// and initialize them as well.
         /// </summary>
-        protected override void Initialize() {
+        protected override void Initialize()
+        {
             // TODO: Add your initialization logic here
             graphics.PreferredBackBufferWidth = WIDTH;
             graphics.PreferredBackBufferHeight = HEIGTH;
@@ -363,10 +442,11 @@ namespace TDGame {
         /// LoadContent will be called once per game and is the place to load
         /// all of your content.
         /// </summary>
-        protected override void LoadContent() {
+        protected override void LoadContent()
+        {
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            _tstorage = new Dictionary<string, Texture2D>() 
+            _tstorage = new Dictionary<string, Texture2D>()
             {
                 { "enemy_1",            Content.Load<Texture2D>("enemy_1") },
                 { "enemy_2",            Content.Load<Texture2D>("enemy_2") },
@@ -395,15 +475,19 @@ namespace TDGame {
                 { "tryagain",           Content.Load<Texture2D>("tryagain") },
                 { "highscore",          Content.Load<Texture2D>("highscore") },
                 { "gameover",           Content.Load<Texture2D>("gameover") },
-                { "naslov",             Content.Load<Texture2D>("naslov") }
+                { "naslov",             Content.Load<Texture2D>("naslov") },
+                { "credits",            Content.Load<Texture2D>("credits") },
+                { "ozadje",             Content.Load<Texture2D>("ozadje") }
             };
 
-            _fstorage = new Dictionary<string, SpriteFont>() 
+            _fstorage = new Dictionary<string, SpriteFont>()
             {
                 { "DamageFont",     Content.Load<SpriteFont>("DamageFont") },
                 { "hs_wave",        Content.Load<SpriteFont>("hs_wave") },
                 { "gameover_font",  Content.Load<SpriteFont>("gameover_font") },
-                { "font",           Content.Load<SpriteFont>("font") }
+                { "font",           Content.Load<SpriteFont>("font") },
+                { "FontCredits",    Content.Load<SpriteFont>("FontCredits") },
+                { "RetroFont",      Content.Load<SpriteFont>("RetroFont") }
             };
 
             LoadMainScreen();
@@ -413,7 +497,8 @@ namespace TDGame {
         /// UnloadContent will be called once per game and is the place to unload
         /// game-specific content.
         /// </summary>
-        protected override void UnloadContent() {
+        protected override void UnloadContent()
+        {
             // TODO: Unload any non ContentManager content here
         }
 
@@ -422,60 +507,86 @@ namespace TDGame {
         /// checking for collisions, gathering input, and playing audio.
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
-        protected override void Update(GameTime gameTime) {
+        protected override void Update(GameTime gameTime)
+        {
             _fire_bullet_time += gameTime.ElapsedGameTime.TotalMilliseconds;
             int Highscore = 0;
 
             var ks = Keyboard.GetState();
             var ms = Mouse.GetState();
 
-            hack:
-            switch (_state) {
+        hack:
+            switch (_state)
+            {
                 case CGameState.MainScreen:
                     var ret = _mainscreen.Update(ms);
-                    if (ret.HasValue && (ret.Value == CGameState.Quit || ret.Value == CGameState.StartGame)) {
+                    if (ret.HasValue && (ret.Value == CGameState.Quit || ret.Value == CGameState.StartGame || ret.Value == CGameState.CreditsScreen))
+                    {
                         _state = ret.Value;
                         goto hack;
                     }
                     break;
+
+                case CGameState.CreditsScreen:
+                    if (_creditsScreen == null)
+                    {
+                        LoadCreditsScreen();
+                    }
+
+                    ret = _creditsScreen.Update(ms);
+                    if (ret.HasValue && ret.Value == CGameState.MainScreen)
+                    {
+                        _state = ret.Value;
+                        goto hack;
+                    }
+                    break;
+
                 case CGameState.StartGame:
                     LoadGame();
                     break;
+
                 case CGameState.Playing:
-                    if (ms.LeftButton == ButtonState.Pressed && _fire_bullet_time > 180) {
+                    if (ms.LeftButton == ButtonState.Pressed && _fire_bullet_time > 180)
+                    {
                         _bullet_manager.Add(_player.GetPosition(), _player.GetDirection());
                         _fire_bullet_time = 0;
                     }
 
-                    _player                 .Update(ks, ms);
-                    _background_manager     .Update(_wave_manager.WaveCount, _wave_manager.Highscore);
-                    _bullet_manager         .Update();
-                    _bullet_hits_enemy      .Update();
-                    _portal_manager         .Update();
-                    _energy_storage_manager .Update();
-                    _powerup_manager        .Update(gameTime, ref _player, ref _energy_storage_manager);
+                    _player.Update(ks, ms);
+                    _background_manager.Update(_wave_manager.WaveCount, _wave_manager.Highscore);
+                    _bullet_manager.Update();
+                    _bullet_hits_enemy.Update();
+                    _portal_manager.Update();
+                    _energy_storage_manager.Update();
+                    _powerup_manager.Update(gameTime, ref _player, ref _energy_storage_manager);
                     _enemy_managers.Values
                         .ToList()
-                        .ForEach(x => x     .Update(ref Highscore, gameTime));
-                    _wave_manager           .Update(gameTime, ref Highscore);
+                        .ForEach(x => x.Update(ref Highscore, gameTime));
+                    _wave_manager.Update(gameTime, ref Highscore);
                     //game over 
-                    if (_energy_storage_manager._energy_storages.Count == 0) {
+                    if (_energy_storage_manager._energy_storages.Count == 0)
+                    {
                         _state = CGameState.Gameover;
                         goto hack;
                     }
                     break;
+
                 case CGameState.Gameover:
                     if (_gameoverscreen == null)
                         LoadGameOver(_wave_manager.Highscore);
                     ret = _gameoverscreen.Update(ms);
-                    if (ret.HasValue && ret.Value == CGameState.StartGame) {
+                    if (ret.HasValue && ret.Value == CGameState.StartGame)
+                    {
                         _state = ret.Value;
                         goto hack;
-                    } else if (ret.HasValue && ret.Value == CGameState.Quit) {
+                    }
+                    else if (ret.HasValue && ret.Value == CGameState.Quit)
+                    {
                         _state = ret.Value;
                         goto hack;
                     }
                     break;
+
                 case CGameState.Quit:
                     Exit();
                     break;
@@ -491,30 +602,38 @@ namespace TDGame {
         /// This is called when the game should draw itself.
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
-        protected override void Draw(GameTime gameTime) {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+        protected override void Draw(GameTime gameTime)
+        {
+            GraphicsDevice.Clear(Color.DimGray);
 
             spriteBatch.Begin();
 
-            switch (_state) {
+            switch (_state)
+            {
                 case CGameState.MainScreen:
-                    _mainscreen             .Draw(spriteBatch);
+                    _mainscreen.Draw(spriteBatch);
                     break;
+
+                case CGameState.CreditsScreen:
+                    _creditsScreen.Draw(spriteBatch);
+                    break;
+
                 case CGameState.Playing:
-                case CGameState.Gameover:
-                    _background_manager     .Draw(spriteBatch);
-                    _portal_manager         .Draw(spriteBatch);
-                    _bullet_manager         .Draw(spriteBatch);
+                _background_manager.Draw(spriteBatch);
+                    _portal_manager.Draw(spriteBatch);
+                    _bullet_manager.Draw(spriteBatch);
                     _enemy_managers.Values
                         .ToList()
-                        .ForEach(x => x     .Draw(spriteBatch));
-                    _player                 .Draw(spriteBatch);
-                    _energy_storage_manager .Draw(spriteBatch);
-                    _bullet_hits_enemy      .Draw(spriteBatch);
-                    _powerup_manager        .Draw(spriteBatch);
+                        .ForEach(x => x.Draw(spriteBatch));
+                    _player.Draw(spriteBatch);
+                    _energy_storage_manager.Draw(spriteBatch);
+                    _bullet_hits_enemy.Draw(spriteBatch);
+                    _powerup_manager.Draw(spriteBatch);
 
-                    if (_state == CGameState.Gameover)
-                        _gameoverscreen.Draw(spriteBatch);
+                    break;
+
+                case CGameState.Gameover:
+                    _gameoverscreen.Draw(spriteBatch);
                     break;
             }
 

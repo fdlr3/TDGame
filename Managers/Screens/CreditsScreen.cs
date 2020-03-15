@@ -3,17 +3,16 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace TDGame.Managers
 {
-    public class MainScreen
+    public class CreditsScreen
     {
         private List<Button> _buttons;
         private List<Tuple<Texture2D, Vector2>> _images;
         private List<Tuple<SpriteFont, Vector2, string>> _texts;
 
-        public MainScreen()
+        public CreditsScreen()
         {
             _buttons = new List<Button>();
             _images = new List<Tuple<Texture2D, Vector2>>();
@@ -48,6 +47,5 @@ namespace TDGame.Managers
             foreach (var tex in _texts)
                 spriteBatch.DrawString(tex.Item1, tex.Item3, tex.Item2, Color.White);
         }
-
     }
 }

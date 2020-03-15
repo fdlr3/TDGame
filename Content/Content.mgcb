@@ -13,6 +13,18 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin credits.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:credits.png
+
 #begin damage_pu.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -146,6 +158,13 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:Font.spritefont
+
+#begin FontCredits.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:FontCredits.spritefont
 
 #begin gameover.png
 /importer:TextureImporter
@@ -293,6 +312,18 @@
 /processorParam:TextureFormat=Color
 /build:okrogel_metek6.png
 
+#begin ozadje.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:ozadje.png
+
 #begin play.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -340,6 +371,16 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:portal_vecji.png
+
+#begin Retro Gaming.ttf
+/copy:Retro Gaming.ttf
+
+#begin RetroFont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:RetroFont.spritefont
 
 #begin right_energy_hp.png
 /importer:TextureImporter
